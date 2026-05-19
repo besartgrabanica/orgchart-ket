@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KiKxxl-evroTarget — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4ff;--surface:#fff;--border:#dde3f0;--text:#111827;--muted:#6b7280;--accent:#1d4ed8;--accent-l:#dbeafe;--red:#dc2626;--red-l:#fee2e2;--teal:#0f766e;--font:'Outfit',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);height:100vh;display:flex;flex-direction:column;}
+body.locked > *:not(#auth-overlay){visibility:hidden;}
+#auth-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;color:var(--muted);font-size:.9rem;}
+body.unlocked #auth-overlay{display:none;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.brand{display:flex;align-items:center;gap:.65rem;}
+.badge{background:var(--accent);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.07em;padding:.22rem .55rem;border-radius:5px;text-transform:uppercase;white-space:nowrap;}
+.brand-name{font-size:1rem;font-weight:700;color:var(--text);}
+.role-tag{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:4px;}
+.role-tag.admin{background:#fef3c7;color:#92400e;}
+.role-tag.editor{background:#dbeafe;color:#1d4ed8;}
+.role-tag.viewer{background:#f1f5f9;color:#475569;}
+.role-tag.developer{background:#f0fdf4;color:#0f766e;}
+.role-tag.superadmin{background:#fae8ff;color:#7e22ce;}
+.btn{padding:.38rem .9rem;border-radius:7px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;transition:all .13s;}
+.btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:#1e40af;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}.btn-ghost:hover{color:var(--text);}
+.btn-teal{background:#ccfbf1;color:var(--teal);border:1px solid #99f6e4;}.btn-teal:hover{background:#99f6e4;}
+.btn-danger{background:var(--red-l);color:var(--red);}.btn-danger:hover{background:#fecaca;}
+.btn-sm{padding:.3rem .7rem;font-size:.78rem;}
+.btn:disabled{opacity:.55;cursor:not-allowed;}
+/* Sync banner — commented out for now
+#sync-banner{display:none;background:#fef3c7;border-bottom:1px solid #fcd34d;padding:.55rem 1.5rem;font-size:.84rem;color:#92400e;align-items:center;gap:.7rem;}
+#sync-banner.visible{display:flex;}
+#sync-banner.dismissed{display:none !important;}
+#sync-banner strong{color:#7c2d12;}
+#sync-banner-dismiss{margin-left:auto;background:none;border:none;color:#92400e;font-size:1rem;line-height:1;cursor:pointer;padding:.2rem .45rem;border-radius:5px;font-weight:700;}
+#sync-banner-dismiss:hover{background:rgba(146,64,14,.12);}
+*/
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;flex-shrink:0;overflow-x:auto;}
+.tab{padding:.7rem 1rem;font-size:.84rem;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font);white-space:nowrap;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
+.tab.admin-only{position:relative;}
+.tab.admin-only::after{content:'admin';position:absolute;top:.15rem;right:.15rem;font-size:.5rem;background:#fef3c7;color:#92400e;padding:.05rem .25rem;border-radius:3px;font-weight:700;}
+.tab.dev-only{position:relative;}
+.tab.dev-only::after{content:'dev';position:absolute;top:.15rem;right:.15rem;font-size:.5rem;background:#f0fdf4;color:#0f766e;padding:.05rem .25rem;border-radius:3px;font-weight:700;}
+.layout{display:flex;flex:1;overflow:hidden;}
+aside{width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-top{padding:.7rem;border-bottom:1px solid var(--border);display:flex;gap:.5rem;}
+.sidebar-top input{flex:1;padding:.38rem .65rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:.83rem;outline:none;}
+.sidebar-top input:focus{border-color:var(--accent);}
+#emp-list-scroll,#pos-list-scroll,#dept-list-scroll,#proj-list-scroll,#div-list-scroll{flex:1;overflow-y:auto;}
+.list-row{display:flex;align-items:center;gap:.6rem;padding:.58rem .85rem;border-bottom:1px solid #f8fafc;cursor:pointer;}
+.list-row:hover{background:var(--bg);}
+.list-row.active{background:var(--accent-l);border-left:3px solid var(--accent);}
+.list-row img{width:32px;height:32px;border-radius:8px;flex-shrink:0;}
+.list-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.list-row-info strong{font-size:.85rem;color:var(--text);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px;}
+.list-row-info span{font-size:.73rem;color:var(--muted);}
+/* Positions grouped by department */
+.pos-dept-group{border-bottom:1px solid var(--border);}
+.pos-dept-header{display:flex;align-items:center;gap:.6rem;padding:.45rem .85rem .35rem;background:var(--bg);position:sticky;top:0;z-index:10;}
+.pos-dept-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.pos-dept-name{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.pos-dept-count{font-size:.65rem;font-weight:700;padding:.1rem .38rem;border-radius:100px;background:var(--border);color:var(--muted);margin-left:auto;}
+.pos-list-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .85rem .5rem 1.4rem;border-bottom:1px solid #f8fafc;cursor:pointer;}
+.pos-list-item:hover{background:var(--bg);}
+.pos-list-item.active{background:var(--accent-l);border-left:3px solid var(--accent);}
+.pos-list-item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pos-list-item-info strong{font-size:.83rem;color:var(--text);display:block;}
+.pos-list-item-info span{font-size:.7rem;color:var(--muted);}
+/* Position holders — grouped by dept then by client project */
+.holders-empty{padding:1rem;text-align:center;color:#9ca3af;font-size:.82rem;background:var(--bg);border-radius:8px;}
+.holders-group{margin-bottom:1rem;}
+.holders-group-head{display:flex;align-items:center;gap:.5rem;padding:.4rem 0 .4rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.holders-group-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.holders-group-count{font-size:.65rem;font-weight:700;padding:.1rem .42rem;border-radius:100px;background:var(--border);color:var(--muted);margin-left:.4rem;}
+.holders-subgroup{margin-left:1rem;margin-top:.3rem;margin-bottom:.4rem;}
+.holders-subgroup-head{display:flex;align-items:center;gap:.45rem;padding:.3rem 0;font-size:.7rem;font-weight:600;color:var(--muted);}
+.holders-subgroup-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.13rem .55rem;border-radius:100px;font-size:.66rem;font-weight:700;color:#fff;}
+.holders-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.4rem;margin-left:1rem;}
+.holder-card{display:flex;align-items:center;gap:.55rem;padding:.45rem .65rem;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:all .12s;}
+.holder-card:hover{border-color:var(--accent);background:var(--accent-l);}
+.holder-card img{width:30px;height:30px;border-radius:50%;flex-shrink:0;}
+.holder-card-info strong{font-size:.82rem;color:var(--text);display:block;line-height:1.2;}
+.holder-card-info span{font-size:.68rem;color:var(--muted);}
+.main{flex:1;overflow-y:auto;padding:1.5rem 2rem;}
+.form-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
+.form-head h1{font-size:1.2rem;font-weight:700;}
+.sec{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;border-bottom:1px solid var(--border);padding-bottom:.38rem;margin:1rem 0 .8rem;}
+.sec:first-of-type{margin-top:0;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem;}
+.grid.one{grid-template-columns:1fr;}
+.grid.three{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:.27rem;}
+.field label{font-size:.76rem;font-weight:600;color:#374151;}
+.field input,.field select,.field textarea{padding:.43rem .68rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:.87rem;color:var(--text);outline:none;background:#fff;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-l);}
+.field textarea{resize:vertical;min-height:90px;}
+.req{color:var(--red);}
+.form-actions{display:flex;gap:.6rem;padding-top:.9rem;border-top:1px solid var(--border);margin-top:.9rem;}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;color:#9ca3af;text-align:center;padding:3rem;}
+.empty p{font-size:.87rem;}
+.email-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;}
+.email-row input.email-input{flex:2;}
+.email-row input.email-label-input{flex:1;}
+.email-row .e-pri{padding:.3rem .55rem;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;color:var(--muted);}
+.email-row .e-pri.is-primary{background:#fef3c7;color:#92400e;border-color:#fcd34d;font-weight:700;}
+.email-row .e-rm{padding:.3rem .55rem;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;color:var(--red);}
+.assign-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.4rem;padding:.4rem .55rem;border:1px solid #d1fae5;background:#f0fdf4;border-radius:7px;}
+.assign-row .pchip{font-size:.65rem;font-weight:700;color:#0f766e;padding:.15rem .4rem;border-radius:4px;background:#ccfbf1;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+.assign-row input{flex:1;font-size:.78rem;padding:.3rem .55rem;}
+.assign-row .pri{padding:.3rem .55rem;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.7rem;color:var(--muted);}
+.assign-row .pri.is-primary{background:#fef3c7;color:#92400e;border-color:#fcd34d;font-weight:700;}
+.rel-page,.simple-page{padding:1.5rem 2rem;overflow-y:auto;flex:1;}
+.rel-page h1,.simple-page h1{font-size:1.2rem;font-weight:700;margin-bottom:1.1rem;}
+.rel-add,.add-form{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1.1rem;max-width:760px;}
+.rel-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:.6rem;max-width:760px;}
+.rel-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.rel-card-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.5rem;}
+.rel-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rel-section{margin-top:.6rem;}
+.rel-section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9ca3af;margin-bottom:.25rem;}
+.rel-section p{font-size:.82rem;color:#374151;line-height:1.6;}
+.clause-item{border:1px solid var(--border);border-radius:8px;padding:.5rem .7rem;margin-bottom:.4rem;background:var(--surface);}
+.clause-head{display:flex;align-items:center;gap:.5rem;}
+.clause-code{font-size:.72rem;font-weight:700;background:#dbeafe;color:#1d4ed8;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;}
+.clause-title{font-size:.82rem;font-weight:600;color:var(--text);}
+.clause-desc{font-size:.78rem;color:var(--muted);line-height:1.5;margin-top:.3rem;padding-left:.2rem;}
+.std-dept-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem .9rem;margin-bottom:.6rem;max-width:760px;}
+.std-dept-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem;}
+.sde-header{display:flex;gap:.5rem;padding:.2rem .3rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;border-bottom:1px solid #f1f5f9;}
+.sde-h-clause{flex:0 0 38%;}
+.sde-h-comment{flex:1;}
+.sde-row{display:flex;align-items:center;gap:.5rem;padding:.35rem .3rem;border-bottom:1px solid #f8fafc;font-size:.82rem;}
+.sde-row:hover{background:#f8fafc;}
+.sde-clause{flex:0 0 38%;font-weight:600;color:#1e40af;}
+.sde-comment{flex:1;color:#475569;line-height:1.45;}
+.sde-btn{padding:.15rem .35rem!important;font-size:.6rem!important;flex-shrink:0;}
+.sde-add{display:flex;align-items:center;gap:.35rem;margin-top:.5rem;padding:.35rem .2rem;}
+.sde-input-clause{flex:0 0 38%;font-size:.8rem;padding:.35rem .5rem;border:1px solid var(--border);border-radius:6px;background:#fff;}
+.sde-input-comment{flex:1;font-size:.8rem;padding:.35rem .5rem;border:1px solid var(--border);border-radius:6px;background:#fff;}
+.card-list{display:flex;flex-direction:column;gap:.55rem;max-width:640px;}
+.card-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;display:flex;align-items:flex-start;gap:.75rem;}
+.card-item-body{flex:1;min-width:0;}
+.card-item-body strong{font-size:.9rem;display:block;}
+.card-item-body span{font-size:.78rem;color:var(--muted);display:block;margin-top:.15rem;line-height:1.45;}
+/* Division cards in sidebar */
+.div-list-item{display:flex;align-items:center;gap:.6rem;padding:.55rem .85rem;border-bottom:1px solid #f8fafc;cursor:pointer;}
+.div-list-item:hover{background:var(--bg);}
+.div-list-item.active{background:#f0fdf4;border-left:3px solid var(--teal);}
+.div-list-item-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+.div-list-item-info strong{font-size:.83rem;color:var(--text);display:block;}
+.div-list-item-info span{font-size:.7rem;color:var(--muted);}
+.div-parent-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:.4rem .85rem .2rem;background:var(--bg);}
+/* Division member rows */
+.div-member-row{display:flex;align-items:center;gap:.6rem;padding:.45rem .55rem;border:1px solid #d1fae5;background:#f0fdf4;border-radius:7px;margin-bottom:.35rem;}
+.div-member-row img{width:28px;height:28px;border-radius:7px;}
+.div-member-row .dm-name{font-size:.82rem;font-weight:600;color:var(--text);}
+.div-member-row .dm-role{font-size:.72rem;color:var(--muted);}
+.div-member-row .dm-head{font-size:.62rem;font-weight:700;background:#fef3c7;color:#92400e;padding:.08rem .35rem;border-radius:3px;flex-shrink:0;}
+.tables-wrap{max-width:1000px;overflow-x:auto;}
+.users-table,.keys-table,.invites-table,.webhooks-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.users-table th,.users-table td,.keys-table th,.keys-table td,.invites-table th,.invites-table td,.webhooks-table th,.webhooks-table td{text-align:left;padding:.6rem .85rem;font-size:.84rem;border-bottom:1px solid #f1f5f9;}
+.users-table th,.keys-table th,.invites-table th,.webhooks-table th{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;background:#f8fafc;}
+.users-table tr:last-child td,.keys-table tr:last-child td,.invites-table tr:last-child td,.webhooks-table tr:last-child td{border-bottom:none;}
+.users-table select{padding:.25rem .5rem;border:1px solid var(--border);border-radius:5px;font-size:.78rem;}
+.status-pill{display:inline-block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.13rem .42rem;border-radius:4px;}
+.status-pill.active,.status-pill.live,.status-pill.pending{background:#dcfce7;color:#166534;}
+.status-pill.onboarding{background:#fef9c3;color:#854d0e;}
+.status-pill.paused{background:#fde68a;color:#92400e;}
+.status-pill.ended,.status-pill.revoked,.status-pill.expired{background:#fecaca;color:#991b1b;}
+.status-pill.accepted{background:#dbeafe;color:#1d4ed8;}
+.toggle-switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-switch .slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:24px;transition:.2s;}
+.toggle-switch .slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle-switch input:checked + .slider{background:#dc2626;}
+.toggle-switch input:checked + .slider:before{transform:translateX(20px);}
+.token-display{background:#1e293b;color:#a5f3fc;font-family:'Courier New',monospace;font-size:.85rem;padding:.85rem 1rem;border-radius:8px;word-break:break-all;margin:.5rem 0;}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:9999;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:14px;width:480px;max-width:90vw;padding:1.4rem 1.5rem;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.modal h2{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
+.modal-foot{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.1rem;}
+.modal-error{font-size:.78rem;color:#dc2626;margin-top:.3rem;display:none;}
+.modal-error.visible{display:block;}
+.modal-warning{font-size:.82rem;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:7px;padding:.6rem .8rem;margin-top:.6rem;line-height:1.5;}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.7rem 1.1rem;border-radius:9px;font-size:.84rem;font-weight:500;display:none;z-index:9999;}
+#alert-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:10000;align-items:center;justify-content:center;}
+#alert-overlay.visible{display:flex;}
+#alert-box{background:#fff;border-radius:14px;padding:1.5rem 2rem;max-width:420px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);text-align:center;}
+#alert-box .alert-icon{font-size:2rem;margin-bottom:.6rem;}
+#alert-box .alert-msg{font-size:.92rem;color:#111827;line-height:1.55;margin-bottom:1.1rem;}
+#alert-box button{background:#1d4ed8;color:#fff;border:none;padding:.55rem 1.8rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;}
+#alert-box button:hover{background:#1e40af;}
+.checkbox-row{display:flex;align-items:center;gap:.45rem;margin-bottom:.35rem;font-size:.83rem;color:#374151;}
+.checkbox-row input[type=checkbox]{width:auto;margin:0;}
+.lang-picker{position:relative;}
+.lang-picker-input{width:100%;padding:.45rem .7rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:.84rem;outline:none;}
+.lang-picker-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #dbeafe;}
+.lang-picker-dd{position:absolute;top:100%;left:0;right:0;max-height:180px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:0 0 7px 7px;box-shadow:0 6px 16px rgba(0,0,0,.1);z-index:50;display:none;}
+.lang-picker-dd.open{display:block;}
+.lang-picker-dd .lp-item{padding:.4rem .75rem;font-size:.83rem;cursor:pointer;color:var(--text);}
+.lang-picker-dd .lp-item:hover{background:var(--accent-l);}
+.lang-picker-dd .lp-empty{padding:.6rem .75rem;font-size:.82rem;color:var(--muted);text-align:center;}
+.lang-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;min-height:1.5rem;}
+.lang-tag{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:100px;font-size:.76rem;font-weight:600;background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;}
+.lang-tag .lt-x{cursor:pointer;font-size:.85rem;line-height:1;opacity:.6;margin-left:.1rem;font-weight:700;}
+.lang-tag .lt-x:hover{opacity:1;color:#dc2626;}
+</style>
+</head>
+<body class="locked">
+<div id="auth-overlay">Checking access…</div>
+
+<header>
+<div class="brand"><span class="badge">KiKxxl-evroTarget</span><span class="brand-name">Admin Panel</span></div>
+<div style="display:flex;gap:.6rem;align-items:center">
+<span id="role-tag" class="role-tag" style="display:none"></span>
+<span id="user-badge" style="font-size:.78rem;color:var(--muted);background:#f1f5f9;padding:.25rem .6rem;border-radius:6px;"></span>
+<button class="btn btn-ghost btn-sm" onclick="openPwdModal()">🔑 Password</button>
+<a href="/" class="btn btn-ghost">← View Chart</a>
+<button class="btn btn-ghost" onclick="logout()">Sign out</button>
+</div>
+</header>
+
+<!-- Sync banner — commented out, sync mode disabled for now
+<div id="sync-banner">
+  <span style="font-size:1.1rem">🔒</span>
+  <div style="flex:1">Sync mode is on. Manual edits are blocked. Turn it off in <strong>Integrations → Sync mode</strong> to make changes.</div>
+  <button id="sync-banner-dismiss" type="button" onclick="dismissSyncBanner()" title="Dismiss">✕</button>
+</div>
+-->
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('employees',this)">Employees</button>
+<button class="tab" onclick="showTab('positions',this)">Positions</button>
+<button class="tab" onclick="showTab('departments',this)">Departments</button>
+<button class="tab" onclick="showTab('relations',this)">Dept Relations</button>
+<button class="tab" onclick="showTab('projects',this)">Client Projects</button>
+<button class="tab" onclick="showTab('divisions',this)">Divisions</button>
+<button class="tab" onclick="showTab('locations',this)">Locations</button>
+<button class="tab" onclick="showTab('standards',this)">Standards</button>
+<button class="tab admin-only" onclick="showTab('users',this)">Users</button>
+<!-- Integrations tab — commented out for now
+<button class="tab dev-only" id="tab-btn-integrations" onclick="showTab('integrations',this)" style="display:none">Integrations</button>
+-->
+</div>
+
+<!-- ══ EMPLOYEES ══ -->
+<div id="tab-employees" class="layout">
+<aside>
+<div class="sidebar-top"><input type="text" placeholder="Search…" oninput="filterEmp(this.value)"/><button class="btn btn-primary btn-sm" id="emp-new-btn" onclick="newEmployee()">+ New</button></div>
+<div id="emp-list-scroll"></div>
+</aside>
+<div class="main">
+<div class="empty" id="emp-empty"><p>Select an employee or click <strong>+ New</strong></p></div>
+<div id="emp-form" style="display:none">
+<div class="form-head"><h1 id="emp-form-title">New Employee</h1><button class="btn btn-danger btn-sm" id="emp-del-btn" style="display:none" onclick="confirmDeleteEmployee(editEmpId)">Delete</button></div>
+<div class="sec">Personal</div>
+<div class="grid">
+<div class="field"><label>First Name <span class="req">*</span></label><input id="e-first"/></div>
+<div class="field"><label>Last Name <span class="req">*</span></label><input id="e-last"/></div>
+<div class="field"><label>Phone</label><input id="e-phone"/></div>
+<div class="field"><label>Hire Date</label><input id="e-hire" type="date"/></div>
+<div class="field"><label>Location</label><select id="e-location" onchange="handleSelectCreate('e-location','location')"><option value="">— None —</option></select></div>
+</div>
+<div class="sec">Email Addresses</div>
+<div id="email-rows"></div>
+<button type="button" class="btn btn-ghost btn-sm" onclick="addEmailRow('','',false)" style="margin-top:.3rem">+ Add email</button>
+<div class="sec">Role & Hierarchy</div>
+<div class="grid">
+<div class="field"><label>Belongs to</label><select id="e-parent-type" onchange="onEmpParentTypeChange()"><option value="department">Department</option><option value="project">Client Project</option></select></div>
+<div class="field"><label id="e-parent-label">Department</label><select id="e-parent" onchange="onEmpParentChange()"><option value="">— Select —</option></select></div>
+</div>
+<div class="grid">
+<div class="field"><label>Position</label><select id="e-position" onchange="handleSelectCreate('e-position','position')"><option value="">— Select —</option></select></div>
+<div class="field"><label>Reports To</label><select id="e-manager"><option value="">— Top of chart —</option></select></div>
+</div>
+<div class="sec">Client Project Assignments</div>
+<div id="assign-list"></div>
+<div style="display:flex;gap:.5rem;align-items:end;margin-bottom:.6rem;">
+<div class="field" style="flex:1"><label>Add to project</label><select id="assign-pick" onchange="handleSelectCreate('assign-pick','project')"><option value="">— Select project —</option></select></div>
+<button type="button" class="btn btn-primary btn-sm" onclick="addAssignment()">Add</button>
+</div>
+<div class="sec">Bio</div>
+<div class="grid one"><div class="field"><label>About</label><textarea id="e-bio"></textarea></div></div>
+<div class="grid one"><div class="field"><label>Education</label><textarea id="e-education" placeholder="e.g. BSc Computer Science, University of Pristina, 2018"></textarea></div></div>
+<div class="grid one"><div class="field"><label>Past Experience</label><textarea id="e-experience" placeholder="e.g. 2018-2020 Software Developer at XYZ Corp"></textarea></div></div>
+<div class="form-actions"><button class="btn btn-primary" id="emp-save-btn" onclick="saveEmployee()">Save</button><button class="btn btn-ghost" onclick="cancelEmpForm()">Cancel</button></div>
+</div>
+</div>
+</div>
+
+<!-- ══ POSITIONS ══ -->
+<div id="tab-positions" style="display:none" class="layout">
+<aside>
+<div class="sidebar-top"><input type="text" placeholder="Search…" oninput="filterPos(this.value)"/><button class="btn btn-primary btn-sm" id="pos-new-btn" onclick="newPosition()">+ New</button></div>
+<div id="pos-list-scroll"></div>
+</aside>
+<div class="main">
+<div class="empty" id="pos-empty"><p>Select a position or click <strong>+ New</strong></p></div>
+<div id="pos-form" style="display:none">
+<div class="form-head"><h1 id="pos-form-title">New Position</h1><button class="btn btn-danger btn-sm" id="pos-del-btn" style="display:none" onclick="deletePosition()">Delete</button></div>
+<div class="sec">Details</div>
+<div class="grid">
+<div class="field"><label>Title <span class="req">*</span></label><input id="p-title"/></div>
+<div class="field"><label>Belongs to</label><select id="p-parent-type" onchange="onPosParentTypeChange()"><option value="department">Department</option><option value="project">Client Project</option><option value="">— None —</option></select></div>
+<div class="field"><label id="p-parent-label">Department</label><select id="p-parent" onchange="onPosParentChange()"><option value="">— None —</option></select></div>
+</div>
+<div class="grid one"><div class="field"><label>Description</label><textarea id="p-desc" style="min-height:140px"></textarea></div></div>
+<div class="form-actions"><button class="btn btn-primary" id="pos-save-btn" onclick="savePosition()">Save</button><button class="btn btn-ghost" onclick="cancelPosForm()">Cancel</button></div>
+<div id="pos-holders-section" style="display:none;margin-top:1.5rem">
+  <div class="sec">Employees with this position</div>
+  <div id="pos-holders-body"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══ DEPARTMENTS ══ -->
+<div id="tab-departments" style="display:none" class="layout">
+<aside>
+<div class="sidebar-top"><input type="text" placeholder="Search…" oninput="filterDept(this.value)"/><button class="btn btn-primary btn-sm" id="dept-new-btn" onclick="newDept()">+ New</button></div>
+<div id="dept-list-scroll"></div>
+</aside>
+<div class="main">
+<div class="empty" id="dept-empty"><p>Select a department or click <strong>+ New</strong></p></div>
+<div id="dept-form" style="display:none">
+<div class="form-head"><h1 id="dept-form-title">New Department</h1><button class="btn btn-danger btn-sm" id="dept-del-btn" style="display:none" onclick="deleteDept()">Delete</button></div>
+<div class="sec">Details</div>
+<div class="grid">
+<div class="field"><label>Name <span class="req">*</span></label><input id="d-name"/></div>
+<div class="field"><label>Color</label><input id="d-color" type="color" value="#1d4ed8" style="height:40px;padding:2px;border-radius:7px;border:1px solid var(--border);cursor:pointer"/></div>
+</div>
+<div class="grid one"><div class="field"><label>Department Head</label><select id="d-head"><option value="">— No head —</option></select></div></div>
+<div class="grid one"><div class="field"><label>Description</label><textarea id="d-desc" style="min-height:110px"></textarea></div></div>
+<div class="sec">Divisions <span class="muted" style="font-weight:400;font-size:.78rem">(sub-groupings within this department)</span></div>
+<div id="d-divisions"></div>
+<div class="form-actions"><button class="btn btn-primary" id="dept-save-btn" onclick="saveDept()">Save</button><button class="btn btn-ghost" onclick="cancelDeptForm()">Cancel</button></div>
+</div>
+</div>
+</div>
+
+<!-- ══ RELATIONS ══ -->
+<div id="tab-relations" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+<div class="rel-page">
+<h1>Department Relationships</h1>
+<div class="rel-add">
+<div class="sec" style="margin-top:0">Add New Relationship</div>
+<div class="grid">
+<div class="field"><label>From Department <span class="req">*</span></label><select id="r-dept-a"></select></div>
+<div class="field"><label>To Department <span class="req">*</span></label><select id="r-dept-b"></select></div>
+</div>
+<div class="grid one">
+<div class="field"><label>Relationship Description</label><textarea id="r-relation" style="min-height:70px"></textarea></div>
+<div class="field" style="margin-top:.6rem"><label>Input (what Dept A receives FROM Dept B)</label><textarea id="r-input" style="min-height:70px"></textarea></div>
+<div class="field" style="margin-top:.6rem"><label>Output (what Dept A sends TO Dept B)</label><textarea id="r-output" style="min-height:70px"></textarea></div>
+</div>
+<div style="margin-top:.8rem"><button class="btn btn-primary" id="rel-save-btn" onclick="saveRelation()">Add Relationship</button></div>
+</div>
+<div id="relations-list"></div>
+</div>
+</div>
+
+<!-- ══ CLIENT PROJECTS ══ -->
+<div id="tab-projects" style="display:none" class="layout">
+<aside>
+<div class="sidebar-top"><input type="text" placeholder="Search…" oninput="filterProj(this.value)"/><button class="btn btn-primary btn-sm" id="proj-new-btn" onclick="newProject()">+ New</button></div>
+<div id="proj-list-scroll"></div>
+</aside>
+<div class="main">
+<div class="empty" id="proj-empty"><p>Select a client project or click <strong>+ New</strong></p></div>
+<div id="proj-form" style="display:none">
+<div class="form-head"><h1 id="proj-form-title">New Client Project</h1><button class="btn btn-danger btn-sm" id="proj-del-btn" style="display:none" onclick="deleteProject()">Delete</button></div>
+<div class="sec">Details</div>
+<div class="grid">
+<div class="field"><label>Project Name <span class="req">*</span></label><input id="cp-name"/></div>
+<div class="field"><label>Color</label><input id="cp-color" type="color" value="#0f766e" style="height:40px;padding:2px;border-radius:7px;border:1px solid var(--border);cursor:pointer"/></div>
+</div>
+<div class="grid one"><div class="field"><label>Project Head</label><select id="cp-head"><option value="">— No head —</option></select></div></div>
+<div class="grid">
+<div class="field"><label>Client Company</label><input id="cp-company"/></div>
+<div class="field"><label>Client Contact</label><input id="cp-contact"/></div>
+</div>
+<div class="grid one"><div class="field"><label>Start Date</label><input id="cp-start" type="date"/></div></div>
+<div class="grid one">
+<div class="field"><label>Languages</label>
+<div class="lang-picker" id="cp-lang-picker">
+  <input type="text" class="lang-picker-input" id="cp-lang-search" placeholder="Search and select languages…" autocomplete="off" onfocus="openLangPicker()" oninput="filterLangPicker(this.value)"/>
+  <div class="lang-picker-dd" id="cp-lang-dd"></div>
+</div>
+<div class="lang-tags" id="cp-lang-tags"></div>
+</div>
+</div>
+<div class="grid one"><div class="field"><label>Description</label><textarea id="cp-desc" style="min-height:110px"></textarea></div></div>
+<div class="sec">Divisions <span class="muted" style="font-weight:400;font-size:.78rem">(sub-groupings within this project — e.g. language teams)</span></div>
+<div id="proj-divisions"></div>
+<div class="form-actions"><button class="btn btn-primary" id="proj-save-btn" onclick="saveProject()">Save</button><button class="btn btn-ghost" onclick="cancelProjForm()">Cancel</button></div>
+</div>
+</div>
+</div>
+
+<!-- ══ DIVISIONS ══ -->
+<div id="tab-divisions" style="display:none" class="layout">
+<aside>
+<div class="sidebar-top"><input type="text" placeholder="Search…" oninput="filterDiv(this.value)"/><button class="btn btn-teal btn-sm" id="div-new-btn" onclick="newDivision()">+ New</button></div>
+<div id="div-list-scroll"></div>
+</aside>
+<div class="main">
+<div class="empty" id="div-empty"><p>Select a division or click <strong>+ New</strong><br/><span style="font-size:.8rem">Divisions group employees within a project or department.</span></p></div>
+<div id="div-form" style="display:none">
+<div class="form-head"><h1 id="div-form-title">New Division</h1><button class="btn btn-danger btn-sm" id="div-del-btn" style="display:none" onclick="deleteDivision()">Delete</button></div>
+<div class="sec">Details</div>
+<div class="grid">
+<div class="field"><label>Name <span class="req">*</span></label><input id="dv-name" placeholder="e.g. English Speaking Team"/></div>
+<div class="field"><label>Color</label><input id="dv-color" type="color" value="#6366f1" style="height:40px;padding:2px;border-radius:7px;border:1px solid var(--border);cursor:pointer"/></div>
+</div>
+<div class="grid">
+<div class="field"><label>Belongs to</label><select id="dv-type" onchange="onDivTypeChange()"><option value="project">Client Project</option><option value="department">Department</option><option value="parent">Sub-division of…</option></select></div>
+<div class="field"><label id="dv-parent-label">Project</label><select id="dv-parent" onchange="populateDivMemberPick();populateDivHeadPick()"></select></div>
+</div>
+<div class="grid one"><div class="field"><label>Division Head</label><select id="dv-head"><option value="">— No head —</option></select></div></div>
+<div class="grid one"><div class="field"><label>Description</label><textarea id="dv-desc" style="min-height:90px"></textarea></div></div>
+<div class="sec">Members</div>
+<div id="div-member-list"></div>
+<div style="display:flex;gap:.5rem;align-items:end;margin-bottom:.6rem;">
+<div class="field" style="flex:1"><label>Add employee</label><select id="div-member-pick"><option value="">— Select employee —</option></select></div>
+<div class="field" style="width:140px"><label>Role in division</label><input id="div-member-role" placeholder="optional"/></div>
+<button type="button" class="btn btn-teal btn-sm" onclick="addDivMember()">Add</button>
+</div>
+<div class="form-actions"><button class="btn btn-primary" id="div-save-btn" onclick="saveDivision()">Save</button><button class="btn btn-ghost" onclick="cancelDivForm()">Cancel</button></div>
+</div>
+</div>
+</div>
+
+<!-- ══ LOCATIONS ══ -->
+<div id="tab-locations" style="display:none;flex:1;overflow:hidden;">
+<div class="simple-page">
+<h1>Locations</h1>
+<div class="add-form" style="max-width:520px">
+<div class="grid">
+<div class="field"><label>City / Location Name <span class="req">*</span></label><input id="loc-name" placeholder="e.g. Pristina"/></div>
+<div class="field"><label>Country</label><input id="loc-country" placeholder="e.g. Kosovo"/></div>
+</div>
+<button class="btn btn-primary btn-sm" id="loc-save-btn" onclick="saveLocation()">Add Location</button>
+</div>
+<div class="card-list" id="locations-list" style="max-width:520px"></div>
+</div>
+</div>
+
+<!-- ══ STANDARDS ══ -->
+<div id="tab-standards" style="display:none" class="layout">
+<aside>
+<div class="sidebar-top"><input type="text" placeholder="Search…" oninput="filterStandards(this.value)"/><button class="btn btn-primary btn-sm" onclick="newStandard()">+ New</button></div>
+<div id="std-list-scroll"></div>
+</aside>
+<div class="main">
+<div class="empty" id="std-empty"><p>Select a standard or click <strong>+ New</strong></p></div>
+<div id="std-form" style="display:none">
+<div class="form-head"><h1 id="std-form-title">New Standard</h1><button class="btn btn-danger btn-sm" id="std-del-btn" style="display:none" onclick="deleteStandard()">Delete</button></div>
+<div class="sec">Details</div>
+<div class="grid">
+<div class="field"><label>Code <span class="req">*</span></label><input id="s-code" placeholder="ISO 9001:2015"/></div>
+<div class="field"><label>Full Name <span class="req">*</span></label><input id="s-name" placeholder="Quality Management Systems"/></div>
+</div>
+<div class="grid">
+<div class="field"><label>URL</label><input id="s-url" placeholder="https://…"/></div>
+</div>
+<div class="grid one"><div class="field"><label>Description</label><textarea id="s-desc" style="min-height:80px"></textarea></div></div>
+
+<div class="sec" style="margin-top:1.6rem">Departments <span class="muted" style="font-weight:400;font-size:.78rem">(link this standard to departments and assign clauses with comments)</span></div>
+<div id="std-dept-section" style="display:none">
+<div class="add-form" style="margin-bottom:.8rem">
+<div class="grid">
+<div class="field"><label>Add Department</label><select id="sd-dept-sel"><option value="">Select department…</option></select></div>
+<div class="field"><label>Scope <span class="muted" style="font-weight:400">(optional)</span></label><input id="sd-scope" placeholder="e.g. All production processes"/></div>
+</div>
+<button class="btn btn-primary btn-sm" onclick="addStdDept()">Link Department</button>
+</div>
+<div id="std-dept-list"></div>
+</div>
+
+<div class="form-actions"><button class="btn btn-primary" onclick="saveStandard()">Save</button><button class="btn btn-ghost" onclick="cancelStdForm()">Cancel</button></div>
+</div>
+</div>
+</div>
+
+<!-- ══ USERS ══ -->
+<div id="tab-users" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+<div class="simple-page">
+<h1>User Accounts</h1>
+<div class="add-form" style="max-width:760px">
+<div class="sec" style="margin-top:0">Invite a New User</div>
+<div class="grid">
+<div class="field"><label>Email <span class="req">*</span></label><input id="inv-email" type="email" placeholder="user@example.com"/></div>
+<div class="field"><label>Role <span class="req">*</span></label><select id="inv-role"></select></div>
+</div>
+<button class="btn btn-primary btn-sm" onclick="sendInvite()">Send Invite</button>
+<p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Invites expire in 30 days.</p>
+<p id="invite-hint" style="font-size:.75rem;color:var(--muted);margin-top:.4rem"></p>
+</div>
+<h2 style="font-size:1rem;font-weight:700;margin:1.5rem 0 .7rem">Pending Invites</h2>
+<div class="tables-wrap"><table class="invites-table" id="invites-table"></table></div>
+<h2 style="font-size:1rem;font-weight:700;margin:1.5rem 0 .7rem">Active Users</h2>
+<div class="tables-wrap"><table class="users-table" id="users-table"></table></div>
+<p style="font-size:.75rem;color:var(--muted);margin-top:1rem;max-width:760px">Emergency password reset: <code style="background:#f1f5f9;padding:.05rem .3rem;border-radius:3px">node manage-users.js passwd &lt;username&gt; &lt;newpass&gt;</code></p>
+</div>
+</div>
+
+<!-- ══ INTEGRATIONS — commented out for now ══
+<div id="tab-integrations" style="display:none;flex:1;overflow:hidden;">
+<div class="simple-page">
+<h1>Integrations</h1>
+... (API Keys, Webhooks, Sync Toggle UI — all commented out)
+</div>
+</div>
+══ END INTEGRATIONS ══ -->
+
+<!-- Password modal -->
+<div class="modal-bg" id="pwd-modal">
+<div class="modal">
+<h2>Change your password</h2>
+<div class="field"><label>Current password</label><input id="pwd-current" type="password"/></div>
+<div class="field" style="margin-top:.6rem"><label>New password</label><input id="pwd-new" type="password"/></div>
+<div class="field" style="margin-top:.6rem"><label>Confirm new password</label><input id="pwd-confirm" type="password"/></div>
+<div class="modal-error" id="pwd-error"></div>
+<div class="modal-foot"><button class="btn btn-ghost" onclick="closePwdModal()">Cancel</button><button class="btn btn-primary" onclick="submitPwdChange()">Update</button></div>
+</div>
+</div>
+
+<!-- Token display modal -->
+<div class="modal-bg" id="token-modal">
+<div class="modal">
+<h2 id="token-modal-title">Generated</h2>
+<p style="font-size:.85rem;color:var(--muted)" id="token-modal-sub">Copy this now — it will not be shown again.</p>
+<div class="token-display" id="token-display"></div>
+<button class="btn btn-ghost btn-sm" onclick="copyToken()">📋 Copy</button>
+<div class="modal-warning"><strong>⚠ Warning:</strong> Treat like a password. Store in a secure secrets manager.</div>
+<div class="modal-foot"><button class="btn btn-primary" onclick="closeTokenModal()">I've saved it</button></div>
+</div>
+</div>
+
+<div id="toast"></div>
+<div id="alert-overlay" onclick="closeAlert()"><div id="alert-box" onclick="event.stopPropagation()"><div class="alert-icon" id="alert-icon">⚠️</div><div class="alert-msg" id="alert-msg"></div><button onclick="closeAlert()">OK</button></div></div>
+
+<script>
+let employees=[],positions=[],departments=[],standards=[],relations=[],locations=[],projects=[],users=[],invites=[],apiKeys=[],webhooks=[],divisions=[];
+let editEmpId=null,editPosId=null,editDeptId=null,editProjId=null,editDivId=null;
+let editEmpDetailLoaded=false;
+// Division editor state — list of {id?, name, color, head_employee_id, member_ids[], _persisted, _deleted}
+let currentDivisions=[];
+let currentDivisionParent=null; // {department_id} or {project_id}
+let currentUser=null;
+let empEmails=[],empAssignments=[],divMembers=[];
+const ALLOWED_EVENTS=['employee.created','employee.updated','employee.deleted','project.assignment.changed'];
+const ALL_ROLES=['viewer','editor','admin','developer','superadmin'];
+// Languages users can tick on a project. Stored in the existing TEXT column as
+// a comma-separated list, so older free-text values still work.
+const AVAILABLE_LANGUAGES=['English','German','French','Italian','Spanish','Portuguese','Dutch','Swedish','Norwegian','Danish','Finnish','Polish','Czech','Romanian','Greek','Turkish','Arabic'];
+// Map common ISO codes and abbreviations to full names so stored values like
+// "DE", "EN", "FR" display and match correctly in the picker.
+const LANG_CODE_MAP={'en':'English','de':'German','fr':'French','it':'Italian','es':'Spanish','pt':'Portuguese','nl':'Dutch','sv':'Swedish','no':'Norwegian','da':'Danish','fi':'Finnish','pl':'Polish','cs':'Czech','ro':'Romanian','el':'Greek','tr':'Turkish','ar':'Arabic','eng':'English','ger':'German','deu':'German','fra':'French','ita':'Italian','spa':'Spanish','por':'Portuguese','nld':'Dutch','swe':'Swedish','nor':'Norwegian','dan':'Danish','fin':'Finnish','pol':'Polish','ces':'Czech','ron':'Romanian','ell':'Greek','tur':'Turkish','ara':'Arabic'};
+function normalizeLang(s){
+  const t=s.trim();
+  // Check if it's a code
+  const mapped=LANG_CODE_MAP[t.toLowerCase()];
+  if(mapped) return mapped;
+  // Check if it's already a known full name (case-insensitive)
+  const found=AVAILABLE_LANGUAGES.find(l=>l.toLowerCase()===t.toLowerCase());
+  if(found) return found;
+  // Return as-is (custom language the user typed previously)
+  return t;
+}
+
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.style.cssText=`position:fixed;bottom:1.5rem;right:1.5rem;padding:.7rem 1.1rem;border-radius:9px;font-size:.84rem;font-weight:500;display:block;z-index:9999;${type==='ok'?'background:#f0fdf4;border:1px solid #86efac;color:#166534;':'background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;'}`;clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3000);}
+function showAlert(msg,icon){document.getElementById('alert-icon').textContent=icon||'⚠️';document.getElementById('alert-msg').textContent=msg;document.getElementById('alert-overlay').classList.add('visible');}
+function closeAlert(){document.getElementById('alert-overlay').classList.remove('visible');}
+async function logout(){await fetch('/auth/logout',{method:'POST'});window.location.href='/login.html';}
+
+function canEditOrg(){return ['editor','admin','superadmin'].includes(currentUser?.role);}
+function canManageUsers(){return ['editor','admin','developer','superadmin'].includes(currentUser?.role);}
+function canDevTools(){return ['developer','superadmin'].includes(currentUser?.role);}
+function canSyncMode(){return ['admin','developer','superadmin'].includes(currentUser?.role);}
+
+async function ensureAccess(){
+  let me;
+  try{
+    const res=await fetch('/api/me',{credentials:'same-origin'});
+    if(res.status===401){window.location.replace('/login.html');return false;}
+    me=await res.json();
+  }catch(e){window.location.replace('/?error=authcheck');return false;}
+  const u=me&&me.user;
+  if(!u){window.location.replace('/login.html');return false;}
+  const allowed=['editor','admin','developer','superadmin'];
+  if(!allowed.includes(u.role)){window.location.replace('/?error=noaccess');return false;}
+  currentUser=u;
+  document.getElementById('user-badge').textContent=u.username;
+  const rt=document.getElementById('role-tag');rt.textContent=u.role;rt.className='role-tag '+u.role;rt.style.display='inline-block';
+  if(canManageUsers()) document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='inline-flex');
+  // Integrations tab commented out for now
+  // if(canDevTools()){document.getElementById('tab-btn-integrations').style.display='inline-flex';}
+  document.body.classList.remove('locked');document.body.classList.add('unlocked');
+  return true;
+}
+
+// ── Pessimistic record locking ───────────────────────────────────────────────
+// Only one user can edit a record at a time. Locks auto-expire after 5 min
+// on the server. The client sends a heartbeat every 60s to keep the lock alive.
+let activeLock=null; // {entity_type, entity_id, interval}
+
+async function acquireLock(entityType, entityId){
+  try{
+    const res=await fetch('/api/locks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entity_type:entityType,entity_id:entityId})});
+    if(res.status===423){
+      const data=await res.json();
+      toast(data.error||'Record is locked by another user.','err');
+      return false; // genuinely locked by someone else — don't open
+    }
+    if(!res.ok){
+      // Lock system might be down or table missing — proceed anyway
+      console.warn('[lock] acquire failed, proceeding without lock:', res.status);
+      return true;
+    }
+    // Start heartbeat to keep lock alive
+    const interval=setInterval(()=>{
+      fetch(`/api/locks/${entityType}/${entityId}`,{method:'PUT'}).catch(()=>{});
+    },60000);
+    activeLock={entity_type:entityType,entity_id:entityId,interval};
+    return true;
+  }catch(e){
+    // Network error — proceed without lock rather than blocking the user
+    console.warn('[lock] acquire error, proceeding without lock:', e);
+    return true;
+  }
+}
+
+async function releaseLock(){
+  if(!activeLock) return;
+  clearInterval(activeLock.interval);
+  try{
+    await fetch(`/api/locks/${activeLock.entity_type}/${activeLock.entity_id}`,{method:'DELETE'});
+  }catch(e){/* best effort */}
+  activeLock=null;
+}
+
+// Release all locks when the user leaves the page
+window.addEventListener('beforeunload',()=>{
+  if(activeLock){
+    navigator.sendBeacon(`/api/locks/${activeLock.entity_type}/${activeLock.entity_id}`,new Blob([JSON.stringify({_method:'DELETE'})],{type:'application/json'}));
+  }
+  // Also release via the bulk endpoint (sendBeacon can't do DELETE, so we use a fallback)
+  navigator.sendBeacon('/api/locks',new Blob([]));
+});
+
+async function init(){
+  if(!(await ensureAccess())) return;
+  await Promise.all([loadEmployees(),loadPositions(),loadDepts(),loadStandards(),loadRelations(),loadLocations(),loadProjects(),loadDivisions()]);
+  renderEmpList(employees);
+}
+
+function showTab(name,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['employees','positions','departments','relations','projects','divisions','locations','standards','users'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display=t===name?((['employees','positions','departments','projects','divisions','relations','locations','standards','users'].includes(t))?'flex':'block'):'none';
+  });
+  if(name==='positions') loadPositions().then(()=>renderPosList(positions));
+  if(name==='departments') loadDepts().then(renderDeptList);
+  if(name==='relations') loadRelations().then(renderRelationsList);
+  if(name==='projects') loadProjects().then(renderProjList);
+  if(name==='divisions') loadDivisions().then(()=>renderDivList(divisions));
+  if(name==='locations') loadLocations().then(renderLocationsList);
+  if(name==='standards') loadStandards().then(()=>renderStandardsSidebar());
+  if(name==='users'){loadUsers();loadInvites();}
+}
+
+async function loadEmployees(){employees=await fetch('/api/employees').then(r=>r.json());}
+async function loadPositions(){positions=await fetch('/api/positions').then(r=>r.json());}
+async function loadDepts(){departments=await fetch('/api/departments').then(r=>r.json());}
+async function loadStandards(){standards=await fetch('/api/standards').then(r=>r.json());}
+async function loadRelations(){relations=await fetch('/api/relations').then(r=>r.json());}
+async function loadLocations(){locations=await fetch('/api/locations').then(r=>r.json());}
+async function loadProjects(){projects=await fetch('/api/client-projects').then(r=>r.json());}
+async function loadDivisions(){divisions=await fetch('/api/divisions').then(r=>r.json());}
+
+// ── Sync mode — commented out for now ─────────────────────────────────────────
+// async function toggleSyncMode(checked){ ... }
+
+// ── Password modal ────────────────────────────────────────────────────────────
+function openPwdModal(){document.getElementById('pwd-modal').classList.add('open');['pwd-current','pwd-new','pwd-confirm'].forEach(id=>document.getElementById(id).value='');document.getElementById('pwd-error').classList.remove('visible');}
+function closePwdModal(){document.getElementById('pwd-modal').classList.remove('open');}
+async function submitPwdChange(){
+  const cur=document.getElementById('pwd-current').value,nw=document.getElementById('pwd-new').value,cf=document.getElementById('pwd-confirm').value;
+  const err=document.getElementById('pwd-error');err.classList.remove('visible');
+  if(!cur||!nw||!cf){err.textContent='All fields required.';err.classList.add('visible');return;}
+  if(nw.length<6){err.textContent='Min. 6 characters.';err.classList.add('visible');return;}
+  if(nw!==cf){err.textContent='Passwords do not match.';err.classList.add('visible');return;}
+  const r=await fetch('/api/me/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:cur,new_password:nw})});
+  if(!r.ok){const d=await r.json().catch(()=>({error:'Failed'}));err.textContent=d.error||'Failed';err.classList.add('visible');return;}
+  closePwdModal();toast('Password updated.','ok');
+}
+
+// ── EMPLOYEES ─────────────────────────────────────────────────────────────────
+function renderEmpList(list){
+  const scroll=document.getElementById('emp-list-scroll');
+  if(!list||list.length===0){scroll.innerHTML='<p style="padding:1rem;color:#9ca3af;font-size:.82rem;text-align:center">No employees.</p>';return;}
+  // Group by department first, then within each dept sub-group by primary project
+  const groups=new Map();
+  list.forEach(e=>{
+    const dkey=e.dept_name||'__none__';
+    if(!groups.has(dkey)) groups.set(dkey,{name:e.dept_name||null,color:e.dept_color||'#94a3b8',byProject:new Map()});
+    const g=groups.get(dkey);
+    // Find primary project
+    const pIds=e.project_ids||[];
+    const pName=e.dept_name==='Operations'&&pIds.length>0?
+      (()=>{const p=projects.find(x=>pIds.includes(x.id));return p?p.name:'No project';})()
+      :null;
+    const pkey=pName||'__none__';
+    if(!g.byProject.has(pkey)) g.byProject.set(pkey,{name:pName,employees:[]});
+    g.byProject.get(pkey).employees.push(e);
+  });
+  // Sort: named depts alphabetically, __none__ last
+  const sorted=[...groups.entries()].sort(([a],[b])=>{
+    if(a==='__none__') return 1;if(b==='__none__') return -1;return a.localeCompare(b);
+  });
+  let html='';
+  sorted.forEach(([key,group])=>{
+    html+=`<div class="pos-dept-group">`;
+    const totalInDept=[...group.byProject.values()].reduce((s,g)=>s+g.employees.length,0);
+    html+=`<div class="pos-dept-header"><div class="pos-dept-dot" style="background:${group.color}"></div><span class="pos-dept-name">${escapeHtml(group.name||'No department')}</span><span class="pos-dept-count">${totalInDept}</span></div>`;
+    // Sort projects within the dept
+    const projSorted=[...group.byProject.entries()].sort(([a],[b])=>{
+      if(a==='__none__') return 1;if(b==='__none__') return -1;return a.localeCompare(b);
+    });
+    projSorted.forEach(([pk,pg])=>{
+      if(pk!=='__none__'&&projSorted.length>1){
+        html+=`<div style="display:flex;align-items:center;gap:.4rem;padding:.25rem .85rem .15rem 1.4rem;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">◆ ${escapeHtml(pg.name)}</div>`;
+      }
+      pg.employees.forEach(e=>{
+        const col=(e.dept_color||'1d4ed8').replace('#','');
+        const img=`https://ui-avatars.com/api/?name=${encodeURIComponent(e.first_name+'+'+e.last_name)}&background=${col}&color=fff&size=80&bold=true`;
+        html+=`<div class="pos-list-item ${editEmpId==e.id?'active':''}" onclick="editEmployee(${e.id})"><img src="${img}" style="width:28px;height:28px;border-radius:50%;flex-shrink:0"/><div class="pos-list-item-info"><strong>${escapeHtml(e.first_name+' '+e.last_name)}</strong><span>${escapeHtml(e.position_title||'—')}</span></div></div>`;
+      });
+    });
+    html+=`</div>`;
+  });
+  scroll.innerHTML=html;
+}
+function filterEmp(q){const lq=q.toLowerCase();renderEmpList(employees.filter(e=>(e.first_name+' '+e.last_name+' '+(e.position_title||'')).toLowerCase().includes(lq)));}
+function showEmpForm(){document.getElementById('emp-empty').style.display='none';document.getElementById('emp-form').style.display='block';}
+function cancelEmpForm(){editEmpId=null;releaseLock();document.getElementById('emp-form').style.display='none';document.getElementById('emp-empty').style.display='flex';renderEmpList(employees);}
+function populateEmpSelects(excludeId){
+  // Position dropdown: filter by selected parent (department/project) if any
+  populateEmpPositionDropdown();
+  document.getElementById('e-manager').innerHTML='<option value="">— Top of chart —</option>'+employees.filter(e=>e.id!=excludeId).map(e=>`<option value="${e.id}">${escapeHtml(e.first_name+' '+e.last_name)}</option>`).join('');
+  document.getElementById('e-location').innerHTML='<option value="">— None —</option>'+locations.map(l=>`<option value="${l.id}">${escapeHtml(l.name)}${l.country?', '+escapeHtml(l.country):''}</option>`).join('')+'<option value="__NEW__">+ Create new location…</option>';
+  document.getElementById('assign-pick').innerHTML='<option value="">— Select project —</option>'+projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')+'<option value="__NEW__">+ Create new project…</option>';
+}
+function populateEmpPositionDropdown(){
+  const ptype=document.getElementById('e-parent-type').value;
+  const pval=parseInt(document.getElementById('e-parent').value)||null;
+  let pool=positions;
+  if(pval){
+    if(ptype==='department') pool=positions.filter(p=>p.department_id===pval);
+    else if(ptype==='project') pool=positions.filter(p=>p.project_id===pval);
+  } else {
+    // No parent selected — show only positions with no parent (e.g. CEO)
+    pool=positions.filter(p=>!p.department_id&&!p.project_id);
+  }
+  const sel=document.getElementById('e-position');
+  if(pool.length===0){
+    sel.innerHTML='<option value="">— No positions yet —</option><option value="__NEW__">+ Create new position…</option>';
+  } else {
+    sel.innerHTML='<option value="">— Select position —</option>'+pool.map(p=>`<option value="${p.id}">${escapeHtml(p.title)}</option>`).join('')+'<option value="__NEW__">+ Create new position…</option>';
+  }
+}
+function onEmpParentTypeChange(){
+  const type=document.getElementById('e-parent-type').value;
+  const label=document.getElementById('e-parent-label');
+  const sel=document.getElementById('e-parent');
+  if(type==='department'){
+    label.textContent='Department';
+    sel.innerHTML='<option value="">— Select —</option>'+departments.map(d=>`<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('')+'<option value="__NEW__">+ Create new department…</option>';
+  } else {
+    label.textContent='Client Project';
+    sel.innerHTML='<option value="">— Select —</option>'+projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')+'<option value="__NEW__">+ Create new project…</option>';
+  }
+  populateEmpPositionDropdown();
+}
+async function onEmpParentChange(){
+  const sel=document.getElementById('e-parent');
+  if(sel.value==='__NEW__'){
+    const type=document.getElementById('e-parent-type').value;
+    const kind=type==='project'?'project':'department';
+    await handleSelectCreate('e-parent',kind);
+  }
+  populateEmpPositionDropdown();
+}
+
+// Generic "Create new" dropdown handler. When user picks the __NEW__ option,
+// prompts for a name, POSTs to the appropriate API, refreshes the cache, then
+// re-populates the dropdown with the new entry pre-selected.
+async function handleSelectCreate(selectId,kind){
+  const sel=document.getElementById(selectId);
+  if(sel.value!=='__NEW__') return;
+  const name=prompt(`Name of new ${kind}:`);
+  if(!name||!name.trim()){sel.value='';return;}
+  let res,newId;
+  try{
+    if(kind==='position'){
+      // Link the new position to the currently-selected employee-form parent if applicable
+      const ptype=document.getElementById('e-parent-type')?document.getElementById('e-parent-type').value:'';
+      const pval=document.getElementById('e-parent')?parseInt(document.getElementById('e-parent').value)||null:null;
+      const body={title:name.trim()};
+      if(pval&&ptype==='department') body.department_id=pval;
+      else if(pval&&ptype==='project') body.project_id=pval;
+      res=await fetch('/api/positions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    } else if(kind==='department'){
+      res=await fetch('/api/departments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.trim(),color:'#2563eb'})});
+    } else if(kind==='location'){
+      const country=prompt('Country (optional):')||null;
+      res=await fetch('/api/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.trim(),country:country&&country.trim()?country.trim():null})});
+    } else if(kind==='project'){
+      res=await fetch('/api/client-projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.trim(),status:'active',color:'#0f766e'})});
+    }
+    if(!res||!res.ok){const err=res?(await res.json()).error:'unknown';toast('Could not create: '+err,'err');sel.value='';return;}
+    const created=await res.json();newId=created.id;
+    toast(`Created "${name.trim()}".`,'ok');
+    // Refresh the relevant cache and rebuild dropdowns; rules depend on which select asked for the create
+    if(kind==='position'){
+      await loadPositions();populateEmpPositionDropdown();document.getElementById('e-position').value=newId;
+    } else if(selectId==='p-parent'){
+      // Position form parent
+      if(kind==='department') await loadDepts(); else if(kind==='project') await loadProjects();
+      populatePosParent();document.getElementById('p-parent').value=newId;
+    } else if(selectId==='e-parent'){
+      // Employee form parent
+      if(kind==='department') await loadDepts(); else if(kind==='project') await loadProjects();
+      onEmpParentTypeChange();document.getElementById('e-parent').value=newId;populateEmpPositionDropdown();
+    } else if(kind==='location'){
+      await loadLocations();populateEmpSelects(editEmpId);document.getElementById('e-location').value=newId;
+    } else if(kind==='project'){
+      // Old "Add to project" assignment dropdown
+      await loadProjects();populateEmpSelects(editEmpId);document.getElementById('assign-pick').value=newId;
+    } else if(kind==='department'){
+      await loadDepts();
+    }
+  }catch(e){toast('Error: '+e.message,'err');sel.value='';}
+}
+function renderEmailRows(){document.getElementById('email-rows').innerHTML=empEmails.map((e,i)=>`<div class="email-row"><input class="email-input" placeholder="email@example.com" value="${escapeHtml(e.email||'')}" oninput="empEmails[${i}].email=this.value"/><input class="email-label-input" placeholder="label" value="${escapeHtml(e.label||'')}" oninput="empEmails[${i}].label=this.value"/><button type="button" class="e-pri ${e.is_primary?'is-primary':''}" onclick="setPrimaryEmail(${i})">${e.is_primary?'★':'☆'}</button><button type="button" class="e-rm" onclick="removeEmailRow(${i})">✕</button></div>`).join('');}
+function addEmailRow(email='',label='',is_primary=false){empEmails.push({email,label,is_primary});if(!empEmails.some(e=>e.is_primary)&&empEmails.length>0) empEmails[0].is_primary=true;renderEmailRows();}
+function removeEmailRow(i){const wasPri=empEmails[i].is_primary;empEmails.splice(i,1);if(wasPri&&empEmails.length>0&&!empEmails.some(e=>e.is_primary)) empEmails[0].is_primary=true;renderEmailRows();}
+function setPrimaryEmail(i){empEmails.forEach((e,idx)=>e.is_primary=(idx===i));renderEmailRows();}
+function renderAssignList(){document.getElementById('assign-list').innerHTML=empAssignments.length===0?'<p style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">No assignments.</p>':empAssignments.map((a,i)=>`<div class="assign-row"><span class="pchip">◆ ${escapeHtml(a.project_name)}</span><input placeholder="role on project" value="${escapeHtml(a.role_on_project||'')}" oninput="empAssignments[${i}].role_on_project=this.value"/><button type="button" class="pri ${a.is_primary?'is-primary':''}" onclick="setPrimaryAssign(${i})">${a.is_primary?'★':'☆'}</button><button type="button" class="e-rm" onclick="removeAssign(${i})">✕</button></div>`).join('');}
+function addAssignment(){const sel=document.getElementById('assign-pick');const id=parseInt(sel.value);if(!id)return;if(empAssignments.some(a=>a.project_id===id)){toast('Already assigned.','err');return;}const p=projects.find(x=>x.id===id);empAssignments.push({project_id:id,project_name:p.name,project_color:p.color,role_on_project:'',is_primary:empAssignments.length===0});sel.value='';renderAssignList();}
+function removeAssign(i){const wasPri=empAssignments[i].is_primary;empAssignments.splice(i,1);if(wasPri&&empAssignments.length>0&&!empAssignments.some(a=>a.is_primary)) empAssignments[0].is_primary=true;renderAssignList();}
+function setPrimaryAssign(i){empAssignments.forEach((a,idx)=>a.is_primary=(idx===i));renderAssignList();}
+// ── Employee read-only view ───────────────────────────────────────────────────
+
+function confirmDeleteEmployee(id){
+  if(!id) return;
+  if(!confirm('Are you sure you want to delete this employee? This action cannot be undone.')) return;
+  fetch(`/api/employees/${id}`,{method:'DELETE'}).then(async res=>{
+    if(!res.ok){toast((await res.json()).error,'err');return;}
+    toast('Employee deleted.','ok');
+    await releaseLock();editEmpId=null;
+    document.getElementById('emp-form').style.display='none';document.getElementById('emp-empty').style.display='flex';
+    await loadEmployees();renderEmpList(employees);
+  });
+}
+
+function newEmployee(){
+  editEmpId=null;showEmpForm();
+  document.getElementById('emp-form-title').textContent='New Employee';
+  document.getElementById('emp-del-btn').style.display='none';
+  ['e-first','e-last','e-phone','e-hire','e-bio','e-education','e-experience'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e-location').value='';
+  document.getElementById('e-parent-type').value='department';
+  empEmails=[];renderEmailRows();
+  empAssignments=[];renderAssignList();
+  populateEmpSelects(null);
+  onEmpParentTypeChange();
+  renderEmpList(employees);
+}
+async function editEmployee(id){
+  console.log('[editEmployee] id=', id);
+  if(!(await acquireLock('employee',id))) return;
+  editEmpId=id;showEmpForm();
+
+  // ── IMMEDIATE: fill basic fields from the already-loaded employees array ──
+  const cached=employees.find(x=>x.id===id);
+  document.getElementById('emp-form-title').textContent=cached?`${cached.first_name} ${cached.last_name}`:'Loading…';
+  document.getElementById('emp-del-btn').style.display='inline-flex';
+  document.getElementById('e-first').value=cached?(cached.first_name||''):'';
+  document.getElementById('e-last').value=cached?(cached.last_name||''):'';
+  document.getElementById('e-phone').value=cached?(cached.phone||''):'';
+  document.getElementById('e-hire').value=cached?(cached.hire_date||''):'';
+  document.getElementById('e-bio').value=cached?(cached.bio||''):'';
+  document.getElementById('e-education').value=cached?(cached.education||''):'';
+  document.getElementById('e-experience').value=cached?(cached.experience||''):'';
+  empEmails=[];empAssignments=[];
+  editEmpDetailLoaded=false; // track whether full detail was loaded
+  renderEmpList(employees);
+
+  // Always re-fetch the dropdown source data so the form has fresh options.
+  // This also covers the case where the user lands directly on Employees and
+  // some of these caches are still empty arrays.
+  try{
+    await Promise.all([
+      (positions&&positions.length?Promise.resolve():loadPositions()),
+      (projects&&projects.length?Promise.resolve():loadProjects()),
+      (locations&&locations.length?Promise.resolve():loadLocations()),
+      (departments&&departments.length?Promise.resolve():loadDepts()),
+      (employees&&employees.length?Promise.resolve():loadEmployees()),
+    ]);
+  }catch(err){console.warn('[editEmployee] supporting data load failed',err);}
+
+  let e;
+  try{
+    const res=await fetch(`/api/employees/${id}`);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    e=await res.json();
+  }catch(err){
+    console.warn('[editEmployee] detail fetch failed, using cached data only',err);
+    // Keep the form open with whatever we have from the cached list.
+    // The user can still edit and save basic fields.
+    if(cached){
+      populateEmpSelects(id);
+      onEmpParentTypeChange();
+      empEmails=[];addEmailRow('','',true);
+      empAssignments=[];renderAssignList();
+    }
+    return;
+  }
+  console.log('[editEmployee] loaded',e);
+  editEmpDetailLoaded=true;
+
+  // Set the simple text/number fields FIRST so even if the dropdowns hit a
+  // problem, the user still sees the employee's data.
+  document.getElementById('emp-form-title').textContent=`Editing: ${e.first_name||''} ${e.last_name||''}`.trim()||'Employee';
+  document.getElementById('emp-del-btn').style.display='inline-flex';
+  document.getElementById('e-first').value=e.first_name||'';
+  document.getElementById('e-last').value=e.last_name||'';
+  document.getElementById('e-phone').value=e.phone||'';
+  document.getElementById('e-hire').value=e.hire_date||'';
+  document.getElementById('e-bio').value=e.bio||'';
+  document.getElementById('e-education').value=e.education||'';
+  document.getElementById('e-experience').value=e.experience||'';
+
+  // Now resolve the parent (department vs project) from the position…
+  const pos=e.position_id?positions.find(p=>p.id===e.position_id):null;
+  const ptype=pos&&pos.project_id?'project':'department';
+  document.getElementById('e-parent-type').value=ptype;
+  // …rebuild every dropdown from scratch (this resets Position to a stub list)
+  populateEmpSelects(id);
+  onEmpParentTypeChange();
+  // …point e-parent at the resolved parent (id is a number; select expects a string)
+  const parentId=pos?(pos.project_id||pos.department_id):null;
+  document.getElementById('e-parent').value=parentId?String(parentId):'';
+  // …re-filter the position dropdown based on the now-set parent…
+  populateEmpPositionDropdown();
+
+  // …and make sure the employee's CURRENT position is selectable even if it
+  // doesn't fit the resolved parent (data drift between position parent and
+  // the value we expect). Without this fallback, .value=… below would silently
+  // do nothing and the field would look unfilled.
+  const posSel=document.getElementById('e-position');
+  if(e.position_id&&pos&&!Array.from(posSel.options).some(o=>o.value==String(e.position_id))){
+    const opt=document.createElement('option');
+    opt.value=String(e.position_id);opt.textContent=pos.title+' (current)';
+    posSel.insertBefore(opt,posSel.firstChild);
+  }
+  document.getElementById('e-position').value=e.position_id?String(e.position_id):'';
+
+  // Same fallback for manager and location — if the referenced row is missing
+  // from the dropdown for any reason, inject a "(current)" option.
+  const mgrSel=document.getElementById('e-manager');
+  if(e.manager_id&&!Array.from(mgrSel.options).some(o=>o.value==String(e.manager_id))){
+    const mgr=employees.find(x=>x.id===e.manager_id);
+    if(mgr){const opt=document.createElement('option');opt.value=String(e.manager_id);opt.textContent=`${mgr.first_name} ${mgr.last_name} (current)`;mgrSel.insertBefore(opt,mgrSel.firstChild);}
+  }
+  document.getElementById('e-manager').value=e.manager_id?String(e.manager_id):'';
+
+  const locSel=document.getElementById('e-location');
+  if(e.location_id&&!Array.from(locSel.options).some(o=>o.value==String(e.location_id))){
+    const loc=locations.find(x=>x.id===e.location_id);
+    if(loc){const opt=document.createElement('option');opt.value=String(e.location_id);opt.textContent=`${loc.name}${loc.country?', '+loc.country:''} (current)`;locSel.insertBefore(opt,locSel.firstChild);}
+  }
+  document.getElementById('e-location').value=e.location_id?String(e.location_id):'';
+
+  // Email rows
+  empEmails=(e.emails||[]).map(x=>({email:x.email,label:x.label,is_primary:!!x.is_primary}));
+  if(empEmails.length===0) addEmailRow('','',true); else renderEmailRows();
+
+  // Project assignments
+  empAssignments=(e.projects||[]).map(p=>({project_id:p.id,project_name:p.name,project_color:p.color,role_on_project:p.role_on_project||'',is_primary:!!p.is_primary}));
+  renderAssignList();
+  renderEmpList(employees);
+}
+async function saveEmployee(){
+  const first=document.getElementById('e-first').value.trim(),last=document.getElementById('e-last').value.trim();
+  if(!first||!last){toast('Name required.','err');return;}
+  const cleanEmails=empEmails.filter(e=>e.email&&e.email.trim()).map(e=>({email:e.email.trim(),label:e.label||null,is_primary:!!e.is_primary}));
+  if(cleanEmails.length>0&&!cleanEmails.some(e=>e.is_primary)) cleanEmails[0].is_primary=true;
+
+  // Build the request body. If the full detail wasn't loaded (fetch failed),
+  // we must preserve the existing position/manager/location rather than
+  // overwriting them with null from empty dropdowns.
+  const body={first_name:first,last_name:last,phone:document.getElementById('e-phone').value.trim()||null,hire_date:document.getElementById('e-hire').value||null,bio:document.getElementById('e-bio').value.trim()||null,education:document.getElementById('e-education').value.trim()||null,experience:document.getElementById('e-experience').value.trim()||null,emails:cleanEmails};
+  if(editEmpDetailLoaded){
+    body.position_id=document.getElementById('e-position').value||null;
+    body.manager_id=document.getElementById('e-manager').value||null;
+    body.location_id=document.getElementById('e-location').value||null;
+  }
+
+  const res=await fetch(editEmpId?`/api/employees/${editEmpId}`:'/api/employees',{method:editEmpId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){toast((await res.json().catch(()=>({error:'Save failed'}))).error,'err');return;}
+  const saved=await res.json();
+  const empId=saved.id||editEmpId;
+  // Sync project assignments only if we actually loaded them
+  if(empId&&editEmpDetailLoaded){
+    try{
+      const detail=await fetch(`/api/employees/${empId}`).then(r=>r.ok?r.json():{projects:[]});
+      const serverIds=new Set((detail.projects||[]).map(p=>p.id));
+      const desiredIds=new Set(empAssignments.map(a=>a.project_id));
+      for(const a of empAssignments){
+        await fetch(`/api/client-projects/${a.project_id}/assignments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:empId,role_on_project:a.role_on_project||null,is_primary:a.is_primary?1:0})});
+      }
+      for(const id of serverIds){
+        if(!desiredIds.has(id)) await fetch(`/api/client-projects/${id}/assignments/${empId}`,{method:'DELETE'});
+      }
+    }catch(err){console.warn('[saveEmployee] project sync failed',err);}
+  }
+  toast(editEmpId?'Updated.':'Added.','ok');
+  await releaseLock();await loadEmployees();cancelEmpForm();
+}
+async function deleteEmployee(){confirmDeleteEmployee(editEmpId);}
+
+// ── POSITIONS (grouped by department) ────────────────────────────────────────
+function renderPosList(list){
+  const scroll=document.getElementById('pos-list-scroll');
+  if(!list||list.length===0){scroll.innerHTML='<p style="padding:1rem;color:#9ca3af;font-size:.82rem;text-align:center">No positions.</p>';return;}
+  // Group by department
+  const groups=new Map();// dept_name → {color, positions[]}
+  list.forEach(p=>{
+    const key=p.dept_name||'__none__';
+    if(!groups.has(key)) groups.set(key,{name:p.dept_name||null,color:p.dept_color||'#94a3b8',positions:[]});
+    groups.get(key).positions.push(p);
+  });
+  // Sort groups: named depts alphabetically, no-dept last
+  const sorted=[...groups.entries()].sort(([a],[b])=>{
+    if(a==='__none__') return 1;if(b==='__none__') return -1;return a.localeCompare(b);
+  });
+  let html='';
+  sorted.forEach(([key,group])=>{
+    html+=`<div class="pos-dept-group">`;
+    html+=`<div class="pos-dept-header"><div class="pos-dept-dot" style="background:${group.color}"></div><span class="pos-dept-name">${escapeHtml(group.name||'No department')}</span><span class="pos-dept-count">${group.positions.length}</span></div>`;
+    group.positions.forEach(p=>{
+      html+=`<div class="pos-list-item ${editPosId==p.id?'active':''}" onclick="editPosition(${p.id})"><div class="pos-list-item-dot" style="background:${group.color}"></div><div class="pos-list-item-info"><strong>${escapeHtml(p.title)}</strong><span>${p.headcount} holder${p.headcount!==1?'s':''}</span></div></div>`;
+    });
+    html+=`</div>`;
+  });
+  scroll.innerHTML=html;
+}
+function filterPos(q){const lq=q.toLowerCase();renderPosList(positions.filter(p=>p.title.toLowerCase().includes(lq)));}
+function showPosForm(){document.getElementById('pos-empty').style.display='none';document.getElementById('pos-form').style.display='block';}
+function cancelPosForm(){editPosId=null;document.getElementById('pos-form').style.display='none';document.getElementById('pos-empty').style.display='flex';document.getElementById('pos-holders-section').style.display='none';renderPosList(positions);}
+
+// Position form parent: switches between Department, Client Project, or none
+function onPosParentTypeChange(){
+  const type=document.getElementById('p-parent-type').value;
+  const label=document.getElementById('p-parent-label');
+  const sel=document.getElementById('p-parent');
+  if(type==='department'){
+    label.textContent='Department';
+    sel.innerHTML='<option value="">— None —</option>'+departments.map(d=>`<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('')+'<option value="__NEW__">+ Create new department…</option>';
+  } else if(type==='project'){
+    label.textContent='Client Project';
+    sel.innerHTML='<option value="">— None —</option>'+projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')+'<option value="__NEW__">+ Create new project…</option>';
+  } else {
+    label.textContent='Parent';
+    sel.innerHTML='<option value="">— None —</option>';
+  }
+}
+async function onPosParentChange(){
+  const sel=document.getElementById('p-parent');
+  if(sel.value!=='__NEW__') return;
+  const type=document.getElementById('p-parent-type').value;
+  const kind=type==='project'?'project':'department';
+  await handleSelectCreate('p-parent',kind);
+}
+function populatePosParent(){onPosParentTypeChange();}
+function newPosition(){editPosId=null;showPosForm();document.getElementById('pos-form-title').textContent='New Position';document.getElementById('pos-del-btn').style.display='none';document.getElementById('p-title').value='';document.getElementById('p-desc').value='';document.getElementById('p-parent-type').value='department';populatePosParent();document.getElementById('pos-holders-section').style.display='none';renderPosList(positions);}
+async function editPosition(id){editPosId=id;showPosForm();const p=await fetch(`/api/positions/${id}`).then(r=>r.json());document.getElementById('pos-form-title').textContent=p.title;document.getElementById('pos-del-btn').style.display='inline-flex';
+  // Set parent type based on what the position has
+  const ptype=p.project_id?'project':(p.department_id?'department':'');
+  document.getElementById('p-parent-type').value=ptype;
+  populatePosParent();
+  document.getElementById('p-parent').value=p.project_id||p.department_id||'';
+  document.getElementById('p-title').value=p.title||'';
+  document.getElementById('p-desc').value=p.description||'';
+  renderPosHolders(p.holders||[]);renderPosList(positions);
+}
+
+// Render position holders grouped by department, then by client project
+function renderPosHolders(holders){
+  const section=document.getElementById('pos-holders-section');
+  const body=document.getElementById('pos-holders-body');
+  section.style.display='block';
+  if(!holders||holders.length===0){
+    body.innerHTML='<div class="holders-empty">No employees currently hold this position.</div>';
+    return;
+  }
+  // Group by department first
+  const byDept=new Map();
+  holders.forEach(h=>{
+    const key=h.dept_id||'__none__';
+    if(!byDept.has(key)) byDept.set(key,{dept_name:h.dept_name||'No department',dept_color:h.dept_color||'#94a3b8',holders:[]});
+    byDept.get(key).holders.push(h);
+  });
+  let html='';
+  // Sort: Operations last (since it contains most projects), then by name
+  const deptKeys=[...byDept.keys()].sort((a,b)=>{
+    const A=byDept.get(a).dept_name.toLowerCase(),B=byDept.get(b).dept_name.toLowerCase();
+    if(A==='operations') return 1; if(B==='operations') return -1;
+    return A.localeCompare(B);
+  });
+  deptKeys.forEach(deptKey=>{
+    const dg=byDept.get(deptKey);
+    html+=`<div class="holders-group"><div class="holders-group-head"><div class="holders-group-dot" style="background:${dg.dept_color}"></div>${escapeHtml(dg.dept_name)}<span class="holders-group-count">${dg.holders.length}</span></div>`;
+    // Within each dept, group by client project
+    const byProj=new Map();
+    dg.holders.forEach(h=>{
+      const pkey=h.project_id||'__none__';
+      if(!byProj.has(pkey)) byProj.set(pkey,{project_name:h.project_name,project_color:h.project_color||'#0f766e',holders:[]});
+      byProj.get(pkey).holders.push(h);
+    });
+    // If only "no project" group, render holders flat
+    if(byProj.size===1&&byProj.has('__none__')){
+      html+=`<div class="holders-list">${dg.holders.map(holderCardHtml).join('')}</div>`;
+    } else {
+      const projKeys=[...byProj.keys()].sort((a,b)=>{
+        if(a==='__none__') return 1; if(b==='__none__') return -1;
+        return byProj.get(a).project_name.localeCompare(byProj.get(b).project_name);
+      });
+      projKeys.forEach(pk=>{
+        const pg=byProj.get(pk);
+        if(pk==='__none__'){
+          html+=`<div class="holders-subgroup"><div class="holders-subgroup-head">Not assigned to a client project</div><div class="holders-list">${pg.holders.map(holderCardHtml).join('')}</div></div>`;
+        } else {
+          html+=`<div class="holders-subgroup"><div class="holders-subgroup-head"><span class="holders-subgroup-chip" style="background:${pg.project_color}">${escapeHtml(pg.project_name)}</span></div><div class="holders-list">${pg.holders.map(holderCardHtml).join('')}</div></div>`;
+        }
+      });
+    }
+    html+=`</div>`;
+  });
+  body.innerHTML=html;
+}
+function holderCardHtml(h){
+  const fullName=`${h.first_name} ${h.last_name}`;
+  const col=(h.dept_color||'1d4ed8').replace('#','');
+  const img=`https://ui-avatars.com/api/?name=${encodeURIComponent(h.first_name+'+'+h.last_name)}&background=${col}&color=fff&size=80&bold=true`;
+  return `<div class="holder-card" onclick="goToEmployee(${h.id})"><img src="${img}"/><div class="holder-card-info"><strong>${escapeHtml(fullName)}</strong><span>${escapeHtml(h.dept_name||'—')}</span></div></div>`;
+}
+function goToEmployee(id){showTab('employees',document.querySelector('[onclick*="\\\'employees\\\'"]'));setTimeout(()=>editEmployee(id),120);}
+async function savePosition(){
+  const title=document.getElementById('p-title').value.trim();
+  if(!title){toast('Title required.','err');return;}
+  const ptype=document.getElementById('p-parent-type').value;
+  const pval=document.getElementById('p-parent').value||null;
+  const department_id=ptype==='department'?pval:null;
+  const project_id=ptype==='project'?pval:null;
+  const res=await fetch(editPosId?`/api/positions/${editPosId}`:'/api/positions',{method:editPosId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,department_id,project_id,description:document.getElementById('p-desc').value.trim()||null})});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  toast('Saved.','ok');await loadPositions();renderPosList(positions);if(!editPosId) cancelPosForm();
+}
+async function deletePosition(){if(!editPosId||!confirm('Delete?'))return;await fetch(`/api/positions/${editPosId}`,{method:'DELETE'});toast('Deleted.','ok');cancelPosForm();await loadPositions();renderPosList(positions);}
+
+// ── DEPARTMENTS ───────────────────────────────────────────────────────────────
+function renderDeptList(list){document.getElementById('dept-list-scroll').innerHTML=(list||departments).map(d=>`<div class="list-row ${editDeptId==d.id?'active':''}" onclick="editDept(${d.id})"><div class="list-dot" style="background:${d.color}"></div><div class="list-row-info"><strong>${escapeHtml(d.name)}</strong><span>${d.color}</span></div></div>`).join('')||'<p style="padding:1rem;color:#9ca3af;font-size:.82rem;text-align:center">No departments.</p>';}
+function filterDept(q){const lq=q.toLowerCase();renderDeptList(departments.filter(d=>d.name.toLowerCase().includes(lq)));}
+function showDeptForm(){document.getElementById('dept-empty').style.display='none';document.getElementById('dept-form').style.display='block';}
+function cancelDeptForm(){editDeptId=null;releaseLock();document.getElementById('dept-form').style.display='none';document.getElementById('dept-empty').style.display='flex';renderDeptList();}
+// ── Department read-only view ─────────────────────────────────────────────────
+function newDept(){editDeptId=null;showDeptForm();document.getElementById('dept-form-title').textContent='New Department';document.getElementById('dept-del-btn').style.display='none';document.getElementById('d-name').value='';document.getElementById('d-desc').value='';document.getElementById('d-color').value='#1d4ed8';populateDeptHead([]);currentDivisions=[];currentDivisionParent=null;renderDivisionList();renderDeptList();}
+async function editDept(id){
+  if(!(await acquireLock('department',id))) return;
+  editDeptId=id;showDeptForm();renderDeptList();
+  const cached=departments.find(x=>x.id===id);
+  // Fill immediately from cache
+  document.getElementById('dept-form-title').textContent=cached?.name||'Department';
+  document.getElementById('dept-del-btn').style.display='inline-flex';
+  document.getElementById('d-name').value=cached?.name||'';
+  document.getElementById('d-color').value=cached?.color||'#1d4ed8';
+  document.getElementById('d-desc').value='';
+  const deptEmps=employees.filter(e=>e.dept_id===id);
+  populateDeptHead(deptEmps);
+  document.getElementById('d-head').value=cached?.head_employee_id||'';
+  currentDivisionParent={department_id:id};currentDivisions=[];renderDivisionList();
+  // Enrich from detail API
+  try{
+    const d=await fetch(`/api/departments/${id}`).then(r=>{if(!r.ok) throw new Error('HTTP '+r.status);return r.json();});
+    document.getElementById('dept-form-title').textContent=d.name||'Department';
+    document.getElementById('d-name').value=d.name||'';
+    document.getElementById('d-color').value=d.color||'#1d4ed8';
+    document.getElementById('d-desc').value=d.description||'';
+    document.getElementById('d-head').value=d.head_employee_id||'';
+    currentDivisions=(d.divisions||[]).map(div=>({
+      id:div.id,name:div.name,color:div.color||'#6366f1',
+      head_employee_id:div.head_employee_id||null,
+      member_ids:(div.members||[]).map(m=>m.employee_id),_persisted:true
+    }));
+    renderDivisionList();
+  }catch(err){console.warn('[editDept] detail fetch failed, using cached',err);}
+  renderDeptList();
+}
+function populateDeptHead(pool){
+  const sel=document.getElementById('d-head');
+  sel.innerHTML='<option value="">— No head —</option>'+pool.map(e=>`<option value="${e.id}">${escapeHtml(e.first_name+' '+e.last_name)}</option>`).join('');
+}
+
+// ── Embedded Division Editor (used inside Dept and Project forms) ───────────
+function renderDivisionList(){
+  // Determine which container we're rendering to
+  const container=document.getElementById('d-divisions')||document.getElementById('proj-divisions');
+  if(!container) return;
+  const visible=currentDivisions.filter(d=>!d._deleted);
+  if(visible.length===0){
+    container.innerHTML=`<div style="padding:.7rem 1rem;color:#9ca3af;font-size:.82rem;background:var(--bg);border-radius:8px;margin-bottom:.6rem">No divisions yet.</div>${addDivisionRowHtml()}`;
+  } else {
+    container.innerHTML=visible.map((div,i)=>divisionRowHtml(div,currentDivisions.indexOf(div))).join('')+addDivisionRowHtml();
+  }
+}
+function divisionRowHtml(div,idx){
+  // Determine member pool (employees who can be members of this division)
+  // For dept divisions: dept members. For project divisions: project members.
+  let pool=[];
+  if(currentDivisionParent&&currentDivisionParent.department_id){
+    pool=employees.filter(e=>e.dept_id===currentDivisionParent.department_id);
+  } else if(currentDivisionParent&&currentDivisionParent.project_id){
+    pool=employees.filter(e=>(e.project_ids||[]).includes(currentDivisionParent.project_id));
+  }
+  const memberSet=new Set(div.member_ids||[]);
+  // Head dropdown only shows employees who are actually members of THIS division
+  const headPool=pool.filter(e=>memberSet.has(e.id));
+  const headOpts='<option value="">— No head —</option>'+headPool.map(e=>`<option value="${e.id}"${e.id===div.head_employee_id?' selected':''}>${escapeHtml(e.first_name+' '+e.last_name)}</option>`).join('');
+  const memberCheckboxes=pool.length===0
+    ? '<div style="color:#9ca3af;font-size:.78rem">No eligible members in this parent.</div>'
+    : pool.map(e=>`<label style="display:inline-flex;align-items:center;gap:.3rem;margin:.15rem .5rem .15rem 0;font-size:.78rem;cursor:pointer"><input type="checkbox" ${memberSet.has(e.id)?'checked':''} onchange="toggleDivMember(${idx},${e.id},this.checked)"/>${escapeHtml(e.first_name+' '+e.last_name)}</label>`).join('');
+  return `<div style="border:1px solid var(--border);border-radius:8px;padding:.7rem;margin-bottom:.6rem;background:#fff">
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
+      <input value="${escapeHtml(div.name||'')}" onchange="updateDivField(${idx},'name',this.value)" placeholder="Division name" style="flex:1;padding:.4rem .6rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem"/>
+      <input type="color" value="${div.color||'#6366f1'}" onchange="updateDivField(${idx},'color',this.value)" style="width:38px;height:32px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer"/>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="removeDivision(${idx})" style="color:var(--danger)">Remove</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr;gap:.4rem">
+      <div><label style="font-size:.7rem;color:var(--muted);font-weight:600">HEAD</label>
+        <select onchange="updateDivField(${idx},'head_employee_id',this.value?parseInt(this.value):null)" style="width:100%;padding:.35rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem">${headOpts}</select>
+      </div>
+      <div><label style="font-size:.7rem;color:var(--muted);font-weight:600">MEMBERS</label>
+        <div style="padding:.3rem;border:1px solid var(--border);border-radius:6px;background:var(--bg);max-height:120px;overflow:auto">${memberCheckboxes}</div>
+      </div>
+    </div>
+  </div>`;
+}
+function addDivisionRowHtml(){
+  return `<button type="button" class="btn btn-ghost btn-sm" onclick="addDivision()" style="border:1px dashed var(--border);width:100%;padding:.5rem">+ Add Division</button>`;
+}
+function addDivision(){
+  currentDivisions.push({name:'',color:'#6366f1',head_employee_id:null,member_ids:[],_persisted:false});
+  renderDivisionList();
+}
+function removeDivision(idx){
+  if(currentDivisions[idx]._persisted) currentDivisions[idx]._deleted=true;
+  else currentDivisions.splice(idx,1);
+  renderDivisionList();
+}
+function updateDivField(idx,field,value){currentDivisions[idx][field]=value;}
+function toggleDivMember(idx,empId,checked){
+  const ids=currentDivisions[idx].member_ids||[];
+  if(checked&&!ids.includes(empId)) ids.push(empId);
+  else if(!checked){
+    currentDivisions[idx].member_ids=ids.filter(x=>x!==empId);
+    // If the removed member was the head, clear the head
+    if(currentDivisions[idx].head_employee_id===empId) currentDivisions[idx].head_employee_id=null;
+  }
+  else currentDivisions[idx].member_ids=ids;
+  renderDivisionList(); // re-render so head dropdown updates with new member list
+}
+async function persistDivisions(parent){
+  // parent: {department_id} or {project_id}
+  for(const div of currentDivisions){
+    if(div._deleted&&div.id){
+      await fetch(`/api/divisions/${div.id}`,{method:'DELETE'});
+      continue;
+    }
+    if(!div.name||!div.name.trim()) continue;
+    const body={name:div.name.trim(),color:div.color||null,head_employee_id:div.head_employee_id||null,...parent};
+    let saved;
+    if(div._persisted&&div.id){
+      const r=await fetch(`/api/divisions/${div.id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:body.name,color:body.color,head_employee_id:body.head_employee_id})});
+      saved=await r.json();
+    } else {
+      const r=await fetch('/api/divisions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      saved=await r.json();
+    }
+    if(saved&&saved.id){
+      // Send members with full detail (role, head, primary)
+      const members=(div.member_ids||[]).map(eid=>({employee_id:eid,role_in_division:null,is_head:eid===div.head_employee_id?1:0,is_primary:0}));
+      await fetch(`/api/divisions/${saved.id}/members`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({members})});
+    }
+  }
+}
+async function saveDept(){
+  const name=document.getElementById('d-name').value.trim();
+  if(!name){toast('Name required.','err');return;}
+  const head_employee_id=parseInt(document.getElementById('d-head').value)||null;
+  const body={name,color:document.getElementById('d-color').value,description:document.getElementById('d-desc').value.trim()||null,head_employee_id};
+  const res=await fetch(editDeptId?`/api/departments/${editDeptId}`:'/api/departments',{method:editDeptId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  const saved=await res.json();
+  // Persist divisions (only if dept already exists / was just created)
+  currentDivisionParent={department_id:saved.id};
+  await persistDivisions({department_id: saved.id});
+  toast('Saved.','ok');await releaseLock();await loadDepts();cancelDeptForm();
+}
+async function deleteDept(){if(!editDeptId||!confirm('Delete?'))return;const res=await fetch(`/api/departments/${editDeptId}`,{method:'DELETE'});if(!res.ok){toast((await res.json()).error,'err');return;}toast('Deleted.','ok');cancelDeptForm();await loadDepts();renderDeptList();}
+
+// ── RELATIONS ─────────────────────────────────────────────────────────────────
+function populateRelSelects(){const opts='<option value="">— Select —</option>'+departments.map(d=>`<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');document.getElementById('r-dept-a').innerHTML=opts;document.getElementById('r-dept-b').innerHTML=opts;}
+function renderRelationsList(){
+  populateRelSelects();
+  const list=document.getElementById('relations-list');
+  if(relations.length===0){list.innerHTML='<p style="color:#9ca3af;font-size:.85rem">No relationships yet.</p>';return;}
+  list.innerHTML=relations.map(r=>`<div class="rel-card" id="rel-card-${r.id}">
+    <div class="rel-card-head">
+      <div class="rel-card-title"><div class="rel-dot" style="background:${r.dept_a_color}"></div>${escapeHtml(r.dept_a_name)} <span style="color:#9ca3af">↔</span> <div class="rel-dot" style="background:${r.dept_b_color}"></div>${escapeHtml(r.dept_b_name)}</div>
+      <div style="display:flex;gap:.4rem">
+        <button class="btn btn-ghost btn-sm" onclick="toggleRelEdit(${r.id})">✏ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRelation(${r.id})">✕</button>
+      </div>
+    </div>
+    <div id="rel-view-${r.id}">
+      ${r.relation?`<div class="rel-section"><div class="rel-section-label">Relationship</div><p>${escapeHtml(r.relation)}</p></div>`:''}
+      ${r.input_from_b?`<div class="rel-section"><div class="rel-section-label">↓ Input from ${escapeHtml(r.dept_b_name)}</div><p>${escapeHtml(r.input_from_b)}</p></div>`:''}
+      ${r.output_to_b?`<div class="rel-section"><div class="rel-section-label">↑ Output to ${escapeHtml(r.dept_b_name)}</div><p>${escapeHtml(r.output_to_b)}</p></div>`:''}
+    </div>
+    <div id="rel-edit-${r.id}" style="display:none;margin-top:.6rem">
+      <div class="field" style="margin-bottom:.5rem"><label>Relationship Description</label><textarea id="re-relation-${r.id}" style="min-height:60px">${escapeHtml(r.relation||'')}</textarea></div>
+      <div class="field" style="margin-bottom:.5rem"><label>↓ Input from ${escapeHtml(r.dept_b_name)}</label><textarea id="re-input-${r.id}" style="min-height:60px">${escapeHtml(r.input_from_b||'')}</textarea></div>
+      <div class="field" style="margin-bottom:.7rem"><label>↑ Output to ${escapeHtml(r.dept_b_name)}</label><textarea id="re-output-${r.id}" style="min-height:60px">${escapeHtml(r.output_to_b||'')}</textarea></div>
+      <div style="display:flex;gap:.4rem">
+        <button class="btn btn-primary btn-sm" onclick="saveRelationEdit(${r.id})">Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleRelEdit(${r.id})">Cancel</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+function toggleRelEdit(id){
+  const view=document.getElementById('rel-view-'+id);
+  const edit=document.getElementById('rel-edit-'+id);
+  const isEditing=edit.style.display!=='none';
+  view.style.display=isEditing?'block':'none';
+  edit.style.display=isEditing?'none':'block';
+}
+async function saveRelationEdit(id){
+  const relation=document.getElementById('re-relation-'+id).value.trim()||null;
+  const input_from_b=document.getElementById('re-input-'+id).value.trim()||null;
+  const output_to_b=document.getElementById('re-output-'+id).value.trim()||null;
+  const res=await fetch(`/api/relations/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({relation,input_from_b,output_to_b})});
+  if(!res.ok){toast('Save failed.','err');return;}
+  toast('Updated.','ok');await loadRelations();renderRelationsList();
+}
+async function saveRelation(){const aId=document.getElementById('r-dept-a').value,bId=document.getElementById('r-dept-b').value;if(!aId||!bId){toast('Both departments required.','err');return;}if(aId===bId){toast('Cannot relate a dept to itself.','err');return;}const res=await fetch('/api/relations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dept_a_id:parseInt(aId),dept_b_id:parseInt(bId),relation:document.getElementById('r-relation').value.trim()||null,input_from_b:document.getElementById('r-input').value.trim()||null,output_to_b:document.getElementById('r-output').value.trim()||null})});if(!res.ok){toast((await res.json()).error,'err');return;}['r-relation','r-input','r-output'].forEach(id=>document.getElementById(id).value='');toast('Added.','ok');await loadRelations();renderRelationsList();}
+async function deleteRelation(id){if(!confirm('Remove?'))return;await fetch(`/api/relations/${id}`,{method:'DELETE'});toast('Removed.','ok');await loadRelations();renderRelationsList();}
+
+// ── CLIENT PROJECTS ───────────────────────────────────────────────────────────
+function renderProjList(list){document.getElementById('proj-list-scroll').innerHTML=(list||projects).map(p=>`<div class="list-row ${editProjId==p.id?'active':''}" onclick="editProject(${p.id})"><div class="list-dot" style="background:${p.color||'#0f766e'}"></div><div class="list-row-info"><strong>${escapeHtml(p.name)}</strong><span>${p.headcount||0} member${p.headcount==1?'':'s'}${p.client_company?' · '+escapeHtml(p.client_company):''}</span></div></div>`).join('')||'<p style="padding:1rem;color:#9ca3af;font-size:.82rem;text-align:center">No projects.</p>';}
+function filterProj(q){const lq=q.toLowerCase();renderProjList(projects.filter(p=>p.name.toLowerCase().includes(lq)||(p.client_company||'').toLowerCase().includes(lq)));}
+function showProjForm(){document.getElementById('proj-empty').style.display='none';document.getElementById('proj-form').style.display='block';}
+function cancelProjForm(){editProjId=null;releaseLock();document.getElementById('proj-form').style.display='none';document.getElementById('proj-empty').style.display='flex';closeLangPicker();renderProjList();}
+
+// ── Language picker (searchable dropdown + tags) ─────────────────────────────
+let selectedLangs=[]; // array of language name strings currently chosen
+
+function renderLangTags(){
+  document.getElementById('cp-lang-tags').innerHTML=selectedLangs.map((l,i)=>
+    `<span class="lang-tag">${escapeHtml(l)}<span class="lt-x" onclick="removeLang(${i})">✕</span></span>`
+  ).join('')||'';
+}
+function openLangPicker(){filterLangPicker(document.getElementById('cp-lang-search').value);}
+function closeLangPicker(){document.getElementById('cp-lang-dd').classList.remove('open');}
+function filterLangPicker(q){
+  const lq=(q||'').toLowerCase();
+  const chosen=new Set(selectedLangs.map(s=>s.toLowerCase()));
+  const matches=AVAILABLE_LANGUAGES.filter(l=>!chosen.has(l.toLowerCase())&&l.toLowerCase().includes(lq));
+  const dd=document.getElementById('cp-lang-dd');
+  if(matches.length===0){
+    dd.innerHTML='<div class="lp-empty">No matches</div>';
+  } else {
+    dd.innerHTML=matches.map(l=>`<div class="lp-item" onmousedown="pickLang('${escapeHtml(l)}')">${escapeHtml(l)}</div>`).join('');
+  }
+  dd.classList.add('open');
+}
+function pickLang(name){
+  if(!selectedLangs.some(l=>l.toLowerCase()===name.toLowerCase())){
+    selectedLangs.push(name);
+  }
+  document.getElementById('cp-lang-search').value='';
+  closeLangPicker();
+  renderLangTags();
+}
+function removeLang(i){selectedLangs.splice(i,1);renderLangTags();}
+// Close the dropdown when clicking outside
+document.addEventListener('click',function(ev){
+  const picker=document.getElementById('cp-lang-picker');
+  if(picker&&!picker.contains(ev.target)) closeLangPicker();
+});
+// ── Project read-only view ────────────────────────────────────────────────────
+function newProject(){
+  editProjId=null;showProjForm();
+  document.getElementById('proj-form-title').textContent='New Client Project';
+  document.getElementById('proj-del-btn').style.display='none';
+  ['cp-name','cp-company','cp-start','cp-contact','cp-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cp-color').value='#0f766e';
+  selectedLangs=[];renderLangTags();
+  populateProjHead([]);
+  currentDivisions=[];currentDivisionParent=null;renderDivisionList();
+  renderProjList();
+}
+async function editProject(id){
+  if(!(await acquireLock('project',id))) return;
+  editProjId=id;showProjForm();renderProjList();
+  const cached=projects.find(x=>x.id===id);
+  // Fill from cache immediately
+  document.getElementById('proj-form-title').textContent=cached?.name||'Project';
+  document.getElementById('proj-del-btn').style.display='inline-flex';
+  document.getElementById('cp-name').value=cached?.name||'';
+  document.getElementById('cp-company').value=cached?.client_company||'';
+  document.getElementById('cp-color').value=cached?.color||'#0f766e';
+  document.getElementById('cp-start').value='';
+  document.getElementById('cp-contact').value='';
+  document.getElementById('cp-desc').value='';
+  selectedLangs=[];renderLangTags();
+  populateProjHead([]);
+  document.getElementById('cp-head').value=cached?.head_employee_id||'';
+  currentDivisionParent={project_id:id};currentDivisions=[];renderDivisionList();
+  // Enrich from detail API
+  try{
+    const p=await fetch(`/api/client-projects/${id}`).then(r=>{if(!r.ok) throw new Error('HTTP '+r.status);return r.json();});
+    document.getElementById('proj-form-title').textContent=p.name||'Project';
+    document.getElementById('cp-name').value=p.name||'';
+    document.getElementById('cp-company').value=p.client_company||'';
+    document.getElementById('cp-color').value=p.color||'#0f766e';
+    document.getElementById('cp-start').value=p.start_date||'';
+    document.getElementById('cp-contact').value=p.client_contact||'';
+    document.getElementById('cp-desc').value=p.description||'';
+    selectedLangs=(p.languages||'').split(',').map(s=>normalizeLang(s)).filter(Boolean);
+    renderLangTags();
+    const projEmps=employees.filter(e=>(e.project_ids||[]).includes(id));
+    populateProjHead(projEmps);
+    document.getElementById('cp-head').value=p.head_employee_id||'';
+    currentDivisions=(p.divisions||[]).map(div=>({
+      id:div.id,name:div.name,color:div.color||'#6366f1',
+      head_employee_id:div.head_employee_id||null,
+      member_ids:(div.members||[]).map(m=>m.employee_id),_persisted:true
+    }));
+    renderDivisionList();
+  }catch(err){console.warn('[editProject] detail fetch failed, using cached',err);}
+  renderProjList();
+}
+function populateProjHead(pool){
+  const sel=document.getElementById('cp-head');
+  sel.innerHTML='<option value="">— No head —</option>'+pool.map(e=>`<option value="${e.id}">${escapeHtml(e.first_name+' '+e.last_name)}</option>`).join('');
+}
+async function saveProject(){
+  const name=document.getElementById('cp-name').value.trim();
+  if(!name){toast('Name required.','err');return;}
+  const head_employee_id=parseInt(document.getElementById('cp-head').value)||null;
+  const langs=selectedLangs;
+  // Projects no longer have status / end date / internal notes — they behave
+  // like departments. We still send `status:'active'` to satisfy the schema's
+  // CHECK constraint, and leave end_date/notes as null.
+  const body={
+    name,client_company:document.getElementById('cp-company').value.trim()||null,
+    status:'active',color:document.getElementById('cp-color').value,
+    start_date:document.getElementById('cp-start').value||null,end_date:null,
+    languages:langs.length?langs.join(', '):null,client_contact:document.getElementById('cp-contact').value.trim()||null,
+    description:document.getElementById('cp-desc').value.trim()||null,notes:null,
+    head_employee_id
+  };
+  const res=await fetch(editProjId?`/api/client-projects/${editProjId}`:'/api/client-projects',{method:editProjId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  const saved=await res.json();
+  currentDivisionParent={project_id:saved.id};
+  await persistDivisions({project_id: saved.id});
+  toast('Saved.','ok');await releaseLock();await loadProjects();cancelProjForm();
+}
+async function deleteProject(){if(!editProjId||!confirm('Delete?'))return;await fetch(`/api/client-projects/${editProjId}`,{method:'DELETE'});toast('Deleted.','ok');cancelProjForm();await loadProjects();renderProjList();}
+
+// ── DIVISIONS ─────────────────────────────────────────────────────────────────
+function renderDivList(list){
+  const scroll=document.getElementById('div-list-scroll');
+  if(!list||list.length===0){scroll.innerHTML='<p style="padding:1rem;color:#9ca3af;font-size:.82rem;text-align:center">No divisions yet.</p>';return;}
+  // Group by project / department
+  const groups=new Map();
+  list.forEach(d=>{
+    let key,label;
+    if(d.project_id){const p=projects.find(x=>x.id===d.project_id);key='proj_'+d.project_id;label='◆ '+(p?p.name:'Project '+d.project_id);}
+    else if(d.department_id){const dept=departments.find(x=>x.id===d.department_id);key='dept_'+d.department_id;label='🏢 '+(dept?dept.name:'Dept '+d.department_id);}
+    else{key='other';label='Other';}
+    if(!groups.has(key)) groups.set(key,{label,items:[]});
+    groups.get(key).items.push(d);
+  });
+  let html='';
+  groups.forEach((g)=>{
+    html+=`<div class="div-parent-label">${escapeHtml(g.label)}</div>`;
+    g.items.forEach(d=>{
+      const color=d.color||'#6366f1';
+      html+=`<div class="div-list-item ${editDivId==d.id?'active':''}" onclick="editDivision(${d.id})"><div class="div-list-item-dot" style="background:${color}"></div><div class="div-list-item-info"><strong>${escapeHtml(d.name)}</strong><span>${d.member_count||0} member${d.member_count!==1?'s':''}</span></div></div>`;
+    });
+  });
+  scroll.innerHTML=html;
+}
+function filterDiv(q){const lq=q.toLowerCase();renderDivList(divisions.filter(d=>d.name.toLowerCase().includes(lq)));}
+function showDivForm(){document.getElementById('div-empty').style.display='none';document.getElementById('div-form').style.display='block';}
+function cancelDivForm(){editDivId=null;releaseLock();document.getElementById('div-form').style.display='none';document.getElementById('div-empty').style.display='flex';renderDivList(divisions);}
+function onDivTypeChange(){
+  const type=document.getElementById('dv-type').value;
+  const label=document.getElementById('dv-parent-label');
+  const sel=document.getElementById('dv-parent');
+  if(type==='project'){label.textContent='Project';sel.innerHTML='<option value="">— Select —</option>'+projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');}
+  else if(type==='department'){label.textContent='Department';sel.innerHTML='<option value="">— Select —</option>'+departments.map(d=>`<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');}
+  else{label.textContent='Parent Division';sel.innerHTML='<option value="">— Select —</option>'+divisions.map(d=>`<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');}
+  populateDivMemberPick();populateDivHeadPick();
+}
+function renderDivMembers(){
+  document.getElementById('div-member-list').innerHTML=divMembers.length===0
+    ?'<p style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">No members yet.</p>'
+    :divMembers.map((m,i)=>{
+      const emp=employees.find(e=>e.id===m.employee_id)||{first_name:'?',last_name:'',dept_color:'6b7280'};
+      const col=(emp.dept_color||'6b7280').replace('#','');
+      const img=`https://ui-avatars.com/api/?name=${encodeURIComponent(emp.first_name+'+'+emp.last_name)}&background=${col}&color=fff&size=80&bold=true`;
+      return `<div class="div-member-row"><img src="${img}"/><div style="flex:1"><div class="dm-name">${escapeHtml(emp.first_name+' '+emp.last_name)}</div><div class="dm-role">${escapeHtml(m.role_in_division||'')}</div></div><button type="button" class="e-rm" onclick="removeDivMember(${i})">✕</button></div>`;
+    }).join('');
+}
+function populateDivMemberPick(){
+  const sel=document.getElementById('div-member-pick');
+  const type=document.getElementById('dv-type').value;
+  const parentVal=parseInt(document.getElementById('dv-parent').value)||null;
+  let pool=employees.filter(e=>!e.is_virtual);
+  if(parentVal){
+    if(type==='project'){
+      // Only employees assigned to this project
+      pool=pool.filter(e=>(e.project_ids||[]).includes(parentVal));
+    } else if(type==='department'){
+      // Only employees in this department (via their position)
+      pool=pool.filter(e=>e.dept_id===parentVal);
+    } else if(type==='parent'){
+      // Only employees who are members of the parent division
+      pool=pool.filter(e=>(e.division_ids||[]).includes(parentVal));
+    }
+  }
+  // Exclude employees already added to this division
+  const already=new Set(divMembers.map(m=>m.employee_id));
+  pool=pool.filter(e=>!already.has(e.id));
+  if(pool.length===0&&parentVal){
+    sel.innerHTML='<option value="">— No eligible employees in this '+type+' —</option>';
+  } else if(!parentVal){
+    sel.innerHTML='<option value="">— Pick a parent first —</option>';
+  } else {
+    sel.innerHTML='<option value="">— Select employee —</option>'+pool.map(e=>`<option value="${e.id}">${escapeHtml(e.first_name+' '+e.last_name)}${e.dept_name?' ('+escapeHtml(e.dept_name)+')':''}</option>`).join('');
+  }
+}
+function addDivMember(){const sel=document.getElementById('div-member-pick');const id=parseInt(sel.value);if(!id)return;const role=document.getElementById('div-member-role').value.trim();divMembers.push({employee_id:id,role_in_division:role||null,is_head:0,is_primary:0});sel.value='';document.getElementById('div-member-role').value='';renderDivMembers();populateDivMemberPick();populateDivHeadPick();}
+function removeDivMember(i){divMembers.splice(i,1);renderDivMembers();populateDivMemberPick();populateDivHeadPick();}
+// Division Head is now a dropdown — populate it with the current members
+function populateDivHeadPick(){
+  const sel=document.getElementById('dv-head');
+  const curVal=sel.value;
+  sel.innerHTML='<option value="">— No head —</option>'+divMembers.map(m=>{
+    const emp=employees.find(e=>e.id===m.employee_id);
+    if(!emp) return '';
+    return `<option value="${m.employee_id}">${escapeHtml(emp.first_name+' '+emp.last_name)}</option>`;
+  }).join('');
+  // Preserve selection if still valid
+  if(curVal&&divMembers.some(m=>String(m.employee_id)===curVal)) sel.value=curVal;
+}
+// ── Division read-only view ───────────────────────────────────────────────────
+function newDivision(){
+  editDivId=null;showDivForm();divMembers=[];
+  document.getElementById('div-form-title').textContent='New Division';
+  document.getElementById('div-del-btn').style.display='none';
+  document.getElementById('dv-name').value='';document.getElementById('dv-desc').value='';document.getElementById('dv-color').value='#6366f1';
+  document.getElementById('dv-type').value='project';onDivTypeChange();
+  document.getElementById('dv-head').value='';
+  renderDivMembers();populateDivMemberPick();populateDivHeadPick();renderDivList(divisions);
+}
+async function editDivision(id){
+  if(!(await acquireLock('division',id))) return;
+  editDivId=id;showDivForm();renderDivList(divisions);
+  const cached=divisions.find(x=>x.id===id);
+  // Fill from cache
+  document.getElementById('div-form-title').textContent=cached?.name||'Division';
+  document.getElementById('div-del-btn').style.display='inline-flex';
+  document.getElementById('dv-name').value=cached?.name||'';
+  document.getElementById('dv-desc').value='';
+  document.getElementById('dv-color').value=cached?.color||'#6366f1';
+  divMembers=[];renderDivMembers();populateDivMemberPick();populateDivHeadPick();
+  // Enrich from detail API
+  try{
+    const d=await fetch(`/api/divisions/${id}`).then(r=>{if(!r.ok) throw new Error('HTTP '+r.status);return r.json();});
+    document.getElementById('div-form-title').textContent=d.name||'Division';
+    document.getElementById('dv-name').value=d.name||'';
+    document.getElementById('dv-desc').value=d.description||'';
+    document.getElementById('dv-color').value=d.color||'#6366f1';
+    if(d.project_id){document.getElementById('dv-type').value='project';onDivTypeChange();document.getElementById('dv-parent').value=d.project_id;}
+    else if(d.department_id){document.getElementById('dv-type').value='department';onDivTypeChange();document.getElementById('dv-parent').value=d.department_id;}
+    else if(d.parent_division_id){document.getElementById('dv-type').value='parent';onDivTypeChange();document.getElementById('dv-parent').value=d.parent_division_id;}
+    divMembers=(d.members||[]).map(m=>({employee_id:m.employee_id,role_in_division:m.role_in_division||null,is_head:m.is_head||0,is_primary:m.is_primary||0}));
+    renderDivMembers();populateDivMemberPick();populateDivHeadPick();
+    document.getElementById('dv-head').value=d.head_employee_id?String(d.head_employee_id):'';
+  }catch(err){console.warn('[editDivision] detail fetch failed, using cached',err);}
+  renderDivList(divisions);
+}
+async function saveDivision(){
+  const name=document.getElementById('dv-name').value.trim();if(!name){toast('Name required.','err');return;}
+  const type=document.getElementById('dv-type').value;const parentVal=document.getElementById('dv-parent').value;
+  if(!parentVal){toast('Select a parent (project, department, or division).','err');return;}
+  const head_employee_id=parseInt(document.getElementById('dv-head').value)||null;
+  const body={name,color:document.getElementById('dv-color').value,description:document.getElementById('dv-desc').value.trim()||null,project_id:type==='project'?parseInt(parentVal):null,department_id:type==='department'?parseInt(parentVal):null,parent_division_id:type==='parent'?parseInt(parentVal):null,head_employee_id};
+  const res=await fetch(editDivId?`/api/divisions/${editDivId}`:'/api/divisions',{method:editDivId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  const saved=await res.json();const divId=saved.id||editDivId;
+  // Save members — replace all at once via PUT
+  if(divId){
+    const members=divMembers.map(m=>({employee_id:m.employee_id,role_in_division:m.role_in_division||null,is_head:m.is_head?1:0,is_primary:m.is_primary?1:0}));
+    await fetch(`/api/divisions/${divId}/members`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({members})});
+  }
+  toast(editDivId?'Updated.':'Created.','ok');await releaseLock();await loadDivisions();cancelDivForm();
+}
+async function deleteDivision(){if(!editDivId||!confirm('Delete this division? Sub-divisions will also be deleted.'))return;await fetch(`/api/divisions/${editDivId}`,{method:'DELETE'});toast('Deleted.','ok');cancelDivForm();await loadDivisions();renderDivList(divisions);}
+
+// ── LOCATIONS ─────────────────────────────────────────────────────────────────
+function renderLocationsList(){document.getElementById('locations-list').innerHTML=locations.map(l=>`<div class="card-item"><div class="card-item-body"><strong>${escapeHtml(l.name)}</strong><span>${escapeHtml(l.country||'—')}</span></div><button class="btn btn-danger btn-sm" onclick="deleteLocation(${l.id})">✕</button></div>`).join('')||'<p style="color:#9ca3af;font-size:.85rem">No locations yet.</p>';}
+async function saveLocation(){const name=document.getElementById('loc-name').value.trim(),country=document.getElementById('loc-country').value.trim();if(!name){toast('Name required.','err');return;}const res=await fetch('/api/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,country:country||null})});if(!res.ok){toast((await res.json()).error,'err');return;}document.getElementById('loc-name').value='';document.getElementById('loc-country').value='';toast('Added.','ok');await loadLocations();renderLocationsList();}
+async function deleteLocation(id){if(!confirm('Delete?'))return;await fetch(`/api/locations/${id}`,{method:'DELETE'});toast('Deleted.','ok');await loadLocations();renderLocationsList();}
+
+// ── STANDARDS ─────────────────────────────────────────────────────────────────
+let editingStdId=null,stdClauses=[];
+function renderStandardsSidebar(filter){
+  const f=(filter||'').toLowerCase();
+  document.getElementById('std-list-scroll').innerHTML=standards.filter(s=>!f||s.code.toLowerCase().includes(f)||s.full_name.toLowerCase().includes(f)).map(s=>`<div class="list-row${s.id===editingStdId?' active':''}" onclick="editStandard(${s.id})"><div class="list-dot" style="background:#1d4ed8"></div><div class="list-row-info"><strong>${escapeHtml(s.code)}</strong><span>${escapeHtml(s.full_name)}</span></div></div>`).join('')||'<p style="padding:1rem;color:#9ca3af;font-size:.82rem;text-align:center">No standards.</p>';
+}
+function filterStandards(v){renderStandardsSidebar(v);}
+function newStandard(){editingStdId=null;stdClauses=[];stdDeptData=[];document.getElementById('std-form').style.display='';document.getElementById('std-empty').style.display='none';document.getElementById('std-form-title').textContent='New Standard';document.getElementById('std-del-btn').style.display='none';document.getElementById('s-code').value='';document.getElementById('s-name').value='';document.getElementById('s-url').value='';document.getElementById('s-desc').value='';document.getElementById('std-dept-list').innerHTML='';document.getElementById('std-dept-section').style.display='none';renderStandardsSidebar();}
+async function editStandard(id){
+  editingStdId=id;
+  const s=await fetch(`/api/standards/${id}`).then(r=>r.json());
+  stdClauses=s.clauses||[];
+  document.getElementById('std-form').style.display='';document.getElementById('std-empty').style.display='none';
+  document.getElementById('std-form-title').textContent='Edit Standard';document.getElementById('std-del-btn').style.display='';
+  document.getElementById('s-code').value=s.code;document.getElementById('s-name').value=s.full_name;document.getElementById('s-url').value=s.url||'';document.getElementById('s-desc').value=s.description||'';
+  document.getElementById('std-dept-section').style.display='';
+  await loadStdDepts();renderStandardsSidebar();
+}
+async function saveStandard(){
+  const code=document.getElementById('s-code').value.trim(),full_name=document.getElementById('s-name').value.trim(),url=document.getElementById('s-url').value.trim(),description=document.getElementById('s-desc').value.trim();
+  if(!code||!full_name){toast('Code and name required.','err');return;}
+  const body=JSON.stringify({code,full_name,url:url||null,description:description||null});
+  let res;
+  if(editingStdId){res=await fetch(`/api/standards/${editingStdId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body});}
+  else{res=await fetch('/api/standards',{method:'POST',headers:{'Content-Type':'application/json'},body});}
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  toast('Saved.','ok');await loadStandards();
+  if(!editingStdId){const data=await res.json();editingStdId=data.id;}
+  renderStandardsSidebar();if(editingStdId) editStandard(editingStdId);
+}
+async function deleteStandard(){if(!confirm('Delete this standard and all its clauses?'))return;await fetch(`/api/standards/${editingStdId}`,{method:'DELETE'});toast('Deleted.','ok');editingStdId=null;stdClauses=[];document.getElementById('std-form').style.display='none';document.getElementById('std-empty').style.display='';await loadStandards();renderStandardsSidebar();}
+function cancelStdForm(){editingStdId=null;stdClauses=[];document.getElementById('std-form').style.display='none';document.getElementById('std-empty').style.display='';renderStandardsSidebar();}
+
+// ── Clauses ──
+function renderClausesList(){
+  const list=document.getElementById('std-clauses-list');
+  if(!stdClauses.length){list.innerHTML='<p style="color:#9ca3af;font-size:.82rem">No clauses yet.</p>';return;}
+  // Build tree
+  const roots=stdClauses.filter(c=>!c.parent_id);
+  const children=pid=>stdClauses.filter(c=>c.parent_id===pid);
+  function renderClause(c,depth){
+    const kids=children(c.id);
+    return `<div class="clause-item" style="margin-left:${depth*1.2}rem">
+      <div class="clause-head">
+        <span class="clause-code">${escapeHtml(c.clause_code)}</span>
+        <span class="clause-title">${escapeHtml(c.title)}</span>
+        <div style="display:flex;gap:.3rem;margin-left:auto">
+          <button class="btn btn-ghost btn-sm" onclick="editClause(${c.id})">✏</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteClause(${c.id})">✕</button>
+        </div>
+      </div>
+      ${c.description?`<div class="clause-desc">${escapeHtml(c.description)}</div>`:''}
+      ${kids.map(k=>renderClause(k,depth+1)).join('')}
+    </div>`;
+  }
+  list.innerHTML=roots.map(c=>renderClause(c,0)).join('');
+  populateClauseParentSelect();
+}
+function populateClauseParentSelect(){
+  const sel=document.getElementById('cl-parent');
+  sel.innerHTML='<option value="">— Top level —</option>'+stdClauses.map(c=>`<option value="${c.id}">${escapeHtml(c.clause_code)} — ${escapeHtml(c.title)}</option>`).join('');
+}
+function showClauseForm(){document.getElementById('std-clause-add').style.display='';document.getElementById('std-add-clause-btn').style.display='none';document.getElementById('cl-code').value='';document.getElementById('cl-title').value='';document.getElementById('cl-desc').value='';document.getElementById('cl-sort').value='0';document.getElementById('cl-parent').value='';populateClauseParentSelect();}
+function cancelClauseForm(){document.getElementById('std-clause-add').style.display='none';document.getElementById('std-add-clause-btn').style.display=editingStdId?'':'none';}
+async function saveClause(){
+  const clause_code=document.getElementById('cl-code').value.trim(),title=document.getElementById('cl-title').value.trim(),description=document.getElementById('cl-desc').value.trim(),parent_id=document.getElementById('cl-parent').value||null,sort_order=parseInt(document.getElementById('cl-sort').value)||0;
+  if(!clause_code||!title){toast('Clause number and title required.','err');return;}
+  const res=await fetch(`/api/standards/${editingStdId}/clauses`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_code,title,description:description||null,parent_id:parent_id?parseInt(parent_id):null,sort_order})});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  toast('Clause added.','ok');cancelClauseForm();
+  const s=await fetch(`/api/standards/${editingStdId}`).then(r=>r.json());stdClauses=s.clauses||[];renderClausesList();
+}
+let editingClauseId=null;
+async function editClause(id){
+  const c=stdClauses.find(x=>x.id===id);if(!c)return;
+  editingClauseId=id;showClauseForm();
+  document.getElementById('cl-code').value=c.clause_code;document.getElementById('cl-title').value=c.title;document.getElementById('cl-desc').value=c.description||'';document.getElementById('cl-sort').value=c.sort_order||0;
+  populateClauseParentSelect();document.getElementById('cl-parent').value=c.parent_id||'';
+  // Swap save button to update
+  document.querySelector('#std-clause-add .btn-primary').textContent='Update Clause';
+  document.querySelector('#std-clause-add .btn-primary').onclick=async function(){
+    const clause_code=document.getElementById('cl-code').value.trim(),title=document.getElementById('cl-title').value.trim(),description=document.getElementById('cl-desc').value.trim(),sort_order=parseInt(document.getElementById('cl-sort').value)||0;
+    if(!clause_code||!title){toast('Required.','err');return;}
+    await fetch(`/api/clauses/${editingClauseId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_code,title,description:description||null,sort_order})});
+    toast('Updated.','ok');editingClauseId=null;cancelClauseForm();
+    document.querySelector('#std-clause-add .btn-primary').textContent='Add Clause';
+    document.querySelector('#std-clause-add .btn-primary').onclick=saveClause;
+    const s=await fetch(`/api/standards/${editingStdId}`).then(r=>r.json());stdClauses=s.clauses||[];renderClausesList();
+  };
+}
+async function deleteClause(id){if(!confirm('Delete this clause?'))return;await fetch(`/api/clauses/${id}`,{method:'DELETE'});toast('Deleted.','ok');const s=await fetch(`/api/standards/${editingStdId}`).then(r=>r.json());stdClauses=s.clauses||[];renderClausesList();}
+
+// Dept links section within standard form — interactive with clause+comment rows
+let stdDeptData=[]; // departments linked to current standard, each with their entries
+async function loadStdDepts(){
+  if(!editingStdId) return;
+  const s=await fetch(`/api/standards/${editingStdId}`).then(r=>r.json());
+  stdClauses=s.clauses||[];
+  stdDeptData=[];
+  for(const d of (s.departments||[])){
+    const entries=await fetch(`/api/departments/${d.id}/standards/${editingStdId}/entries`).then(r=>r.json()).catch(()=>[]);
+    stdDeptData.push({...d,entries});
+  }
+  renderStdDeptList();
+}
+function populateStdDeptSelect(){
+  const linked=new Set(stdDeptData.map(d=>d.id));
+  const sel=document.getElementById('sd-dept-sel');
+  sel.innerHTML='<option value="">Select department…</option>'+departments.filter(d=>!linked.has(d.id)).map(d=>`<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+}
+async function addStdDept(){
+  const deptId=document.getElementById('sd-dept-sel').value;
+  const scope=document.getElementById('sd-scope').value.trim();
+  if(!deptId){toast('Select a department.','err');return;}
+  const res=await fetch(`/api/departments/${deptId}/standards`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({standard_id:editingStdId,scope:scope||null})});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  document.getElementById('sd-scope').value='';
+  toast('Department linked.','ok');await loadStdDepts();
+}
+async function removeStdDept(deptId){
+  if(!confirm('Remove this department and all its clauses?'))return;
+  await fetch(`/api/departments/${deptId}/standards/${editingStdId}`,{method:'DELETE'});
+  toast('Removed.','ok');await loadStdDepts();
+}
+function renderStdDeptList(){
+  populateStdDeptSelect();
+  const list=document.getElementById('std-dept-list');
+  if(!stdDeptData.length){list.innerHTML='<p style="color:#9ca3af;font-size:.82rem">No departments linked yet.</p>';return;}
+  list.innerHTML=stdDeptData.map(d=>{
+    const color=d.color||'#2563eb';
+    const entryRows=d.entries.map(e=>`<div class="sde-row">
+      <div class="sde-clause">${escapeHtml(e.clause_text)}</div>
+      <div class="sde-comment">${e.comment?escapeHtml(e.comment):'<span style="color:#ccc">—</span>'}</div>
+      <button class="btn btn-ghost btn-sm sde-btn" onclick="editStdEntry(${e.id},${d.id})">✏</button>
+      <button class="btn btn-danger btn-sm sde-btn" onclick="deleteStdEntry(${e.id},${d.id})">✕</button>
+    </div>`).join('');
+    return `<div class="std-dept-card">
+      <div class="std-dept-head">
+        <div style="display:flex;align-items:center;gap:.45rem;flex:1">
+          <span style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></span>
+          <strong style="font-size:.88rem">${escapeHtml(d.name)}</strong>
+          ${d.scope?`<span style="font-size:.72rem;color:var(--muted);margin-left:.3rem">${escapeHtml(d.scope)}</span>`:''}
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="removeStdDept(${d.id})">✕</button>
+      </div>
+      ${d.entries.length?`<div class="sde-header"><span class="sde-h-clause">Clause</span><span class="sde-h-comment">Comment</span></div>`:''}
+      ${entryRows}
+      <div class="sde-add" id="sde-add-${d.id}">
+        <input id="sde-clause-${d.id}" placeholder="Clause (e.g. 4.1 Context of the organization)" class="sde-input-clause"/>
+        <input id="sde-comment-${d.id}" placeholder="Comment (optional)" class="sde-input-comment"/>
+        <button class="btn btn-primary btn-sm" onclick="addStdEntry(${d.id})">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function addStdEntry(deptId){
+  const clause_text=document.getElementById('sde-clause-'+deptId).value.trim();
+  const comment=document.getElementById('sde-comment-'+deptId).value.trim();
+  if(!clause_text){toast('Clause text is required.','err');return;}
+  const res=await fetch(`/api/departments/${deptId}/standards/${editingStdId}/entries`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_text,comment:comment||null})});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  document.getElementById('sde-clause-'+deptId).value='';document.getElementById('sde-comment-'+deptId).value='';
+  await loadStdDepts();
+}
+async function deleteStdEntry(entryId,deptId){
+  await fetch(`/api/dept-std-entries/${entryId}`,{method:'DELETE'});
+  await loadStdDepts();
+}
+async function editStdEntry(entryId,deptId){
+  const entry=stdDeptData.find(d=>d.id===deptId)?.entries.find(e=>e.id===entryId);
+  if(!entry)return;
+  const newClause=prompt('Clause:',entry.clause_text);
+  if(newClause===null)return;
+  const newComment=prompt('Comment:',entry.comment||'');
+  if(newComment===null)return;
+  if(!newClause.trim()){toast('Clause cannot be empty.','err');return;}
+  await fetch(`/api/dept-std-entries/${entryId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_text:newClause.trim(),comment:newComment.trim()||null})});
+  await loadStdDepts();
+}
+
+// ── DEPARTMENT CLAUSES (within dept form) ────────────────────────────────────
+let deptClausesList=[];
+async function loadDeptClauses(deptId){
+  deptClausesList=await fetch(`/api/departments/${deptId}/clauses`).then(r=>r.json()).catch(()=>[]);
+  renderDeptClausesList();
+}
+function populateDeptClauseStandards(){
+  const sel=document.getElementById('dc-standard');
+  sel.innerHTML='<option value="">Select…</option>'+standards.map(s=>`<option value="${s.id}">${escapeHtml(s.code)} — ${escapeHtml(s.full_name)}</option>`).join('');
+  document.getElementById('dc-clause').innerHTML='<option value="">Select standard first…</option>';
+}
+async function onDeptClauseStdChange(){
+  const stdId=document.getElementById('dc-standard').value;
+  const sel=document.getElementById('dc-clause');
+  if(!stdId){sel.innerHTML='<option value="">Select standard first…</option>';return;}
+  const s=await fetch(`/api/standards/${stdId}`).then(r=>r.json());
+  const clauses=s.clauses||[];
+  sel.innerHTML='<option value="">Select clause…</option>'+clauses.map(c=>`<option value="${c.id}">${escapeHtml(c.clause_code)} — ${escapeHtml(c.title)}</option>`).join('');
+}
+async function addDeptClause(){
+  const clause_id=document.getElementById('dc-clause').value;
+  const compliance=document.getElementById('dc-compliance').value;
+  const notes=document.getElementById('dc-notes').value.trim();
+  if(!clause_id){toast('Select a clause.','err');return;}
+  const res=await fetch(`/api/departments/${editDeptId}/clauses`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_id:parseInt(clause_id),compliance,notes:notes||null})});
+  if(!res.ok){toast((await res.json()).error,'err');return;}
+  toast('Clause linked.','ok');document.getElementById('dc-notes').value='';
+  await loadDeptClauses(editDeptId);
+}
+function renderDeptClausesList(){
+  const list=document.getElementById('dept-clauses-list');
+  if(!deptClausesList.length){list.innerHTML='<p style="color:#9ca3af;font-size:.82rem">No clauses linked yet.</p>';return;}
+  const compColors={implemented:'#059669',partial:'#d97706',applicable:'#2563eb',not_applicable:'#9ca3af'};
+  const compLabels={implemented:'Implemented',partial:'Partial',applicable:'Applicable',not_applicable:'N/A'};
+  list.innerHTML=deptClausesList.map(c=>{
+    const cc=compColors[c.compliance]||'#9ca3af';
+    return `<div class="clause-item">
+      <div class="clause-head">
+        <span class="clause-code">${escapeHtml(c.standard_code)} ${escapeHtml(c.clause_code)}</span>
+        <span class="clause-title">${escapeHtml(c.title)}</span>
+        <span style="font-size:.65rem;font-weight:600;color:${cc};margin-left:auto;white-space:nowrap">${compLabels[c.compliance]||c.compliance}</span>
+        <button class="btn btn-danger btn-sm" style="margin-left:.3rem" onclick="removeDeptClause(${c.clause_id})">✕</button>
+      </div>
+      ${c.notes?`<div class="clause-desc">${escapeHtml(c.notes)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+async function removeDeptClause(clauseId){
+  if(!confirm('Remove this clause link?'))return;
+  await fetch(`/api/departments/${editDeptId}/clauses/${clauseId}`,{method:'DELETE'});
+  toast('Removed.','ok');await loadDeptClauses(editDeptId);
+}
+
+function fmtDate(s){if(!s)return '—';const d=new Date(s);if(isNaN(d))return escapeHtml(s);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+
+// ── USERS + INVITATIONS ───────────────────────────────────────────────────────
+async function loadUsers(){
+  users=await fetch('/api/users').then(r=>r.json()).catch(()=>[]);
+  const isSuperadmin=currentUser?.role==='superadmin';
+  const isAdmin=currentUser?.role==='admin';
+  const isDev=currentUser?.role==='developer';
+  const roleSel=document.getElementById('inv-role');
+  let availRoles;
+  if(isSuperadmin) availRoles=ALL_ROLES;
+  else if(isAdmin) availRoles=['viewer','editor','admin'];
+  else if(isDev) availRoles=['viewer','editor','developer'];
+  else availRoles=['viewer']; // editor
+  roleSel.innerHTML=availRoles.map(r=>`<option value="${r}">${r}</option>`).join('');
+  document.getElementById('invite-hint').textContent=isSuperadmin?'You can invite any role.':isAdmin?'You can invite viewers, editors and admins.':isDev?'You can invite viewers, editors and developers.':'You can invite viewers only.';
+  const t=document.getElementById('users-table');
+  if(!users.length){t.innerHTML='<tr><td style="color:#9ca3af">No users yet.</td></tr>';return;}
+  let html='<thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th></th></tr></thead><tbody>';
+  users.forEach(u=>{
+    const isMe=u.id===currentUser.id;
+    const canChangeRole=(isSuperadmin||isAdmin)&&!isMe&&u.role!=='superadmin';
+    const canDel=(isSuperadmin&&!isMe&&u.role!=='superadmin')||(isAdmin&&!isMe&&!['superadmin','developer'].includes(u.role));
+    let roleCell;
+    if(canChangeRole){
+      // Filter which roles this admin can assign
+      let editableRoles;
+      if(isSuperadmin) editableRoles=ALL_ROLES;
+      else editableRoles=['viewer','editor','admin']; // admin can't assign dev/superadmin
+      roleCell=`<select onchange="changeUserRole(${u.id},this.value)">${editableRoles.map(r=>`<option value="${r}"${u.role===r?' selected':''}>${r}</option>`).join('')}${!editableRoles.includes(u.role)?`<option value="${u.role}" selected disabled>${u.role}</option>`:''}</select>`;
+    }
+    else{roleCell=`<span class="role-tag ${u.role}">${u.role}</span>`;}
+    html+=`<tr><td><strong>${escapeHtml(u.username)}</strong>${isMe?' <span style="font-size:.7rem;color:var(--muted)">(you)</span>':''}</td><td style="color:var(--muted);font-size:.78rem">${escapeHtml(u.email||'—')}</td><td>${roleCell}</td><td style="color:var(--muted);font-size:.78rem">${fmtDate(u.created_at)}</td><td style="text-align:right">${canDel?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${escapeHtml(u.username)}')">Delete</button>`:''}</td></tr>`;
+  });
+  html+='</tbody>';t.innerHTML=html;
+}
+async function loadInvites(){
+  if(!canManageUsers()){document.getElementById('invites-table').innerHTML='';return;}
+  invites=await fetch('/api/invitations').then(r=>r.json()).catch(()=>[]);
+  // Only show non-accepted invites under "Pending Invites"
+  const pending=invites.filter(i=>i.status!=='accepted');
+  const t=document.getElementById('invites-table');
+  if(!pending.length){t.innerHTML='<tr><td style="color:#9ca3af">No pending invitations.</td></tr>';return;}
+  let html='<thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Expires</th><th>Sent by</th><th></th></tr></thead><tbody>';
+  pending.forEach(i=>{
+    const canResend=i.status==='pending'||i.status==='expired';
+    const canRevoke=i.status==='pending';
+    html+=`<tr><td><strong>${escapeHtml(i.email)}</strong></td><td><span class="role-tag ${i.role}" style="font-size:.65rem">${i.role}</span></td><td><span class="status-pill ${i.status}">${i.status}</span></td><td style="color:var(--muted);font-size:.78rem">${fmtDate(i.expires_at)}</td><td style="color:var(--muted);font-size:.78rem">${escapeHtml(i.invited_by_name||'—')}</td><td style="text-align:right">${canResend?`<button class="btn btn-ghost btn-sm" onclick="resendInvite(${i.id})">Resend</button>`:''}${canRevoke?` <button class="btn btn-danger btn-sm" onclick="revokeInvite(${i.id})">Revoke</button>`:''}</td></tr>`;
+  });
+  html+='</tbody>';t.innerHTML=html;
+}
+async function sendInvite(){const email=document.getElementById('inv-email').value.trim(),role=document.getElementById('inv-role').value;if(!email||!role){showAlert('Email and role are required.','⚠️');return;}const res=await fetch('/api/invitations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,role})});if(!res.ok){const err=(await res.json()).error;showAlert(err||'Could not send invite.','🚫');return;}const data=await res.json();document.getElementById('inv-email').value='';toast(data.dryRun?`Invite created (dry-run — check pm2 logs).`:`Invite sent to ${email}.`,'ok');await loadInvites();}
+async function resendInvite(id){const res=await fetch(`/api/invitations/${id}/resend`,{method:'POST'});if(!res.ok){toast((await res.json()).error,'err');return;}toast('Resent.','ok');await loadInvites();}
+async function revokeInvite(id){if(!confirm('Revoke this invite?'))return;const res=await fetch(`/api/invitations/${id}`,{method:'DELETE'});if(!res.ok){toast((await res.json()).error,'err');return;}toast('Revoked.','ok');await loadInvites();}
+async function changeUserRole(id,role){const res=await fetch(`/api/users/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({role})});if(!res.ok){toast((await res.json()).error,'err');await loadUsers();return;}toast('Role updated.','ok');await loadUsers();}
+async function deleteUser(id,username){if(!confirm(`Delete user "${username}"?`))return;const res=await fetch(`/api/users/${id}`,{method:'DELETE'});if(!res.ok){toast((await res.json()).error,'err');return;}toast('Deleted.','ok');await loadUsers();}
+
+// ── API KEYS — commented out for now ──────────────────────────────────────────
+// async function loadApiKeys(){ ... }
+// async function createApiKey(){ ... }
+// async function revokeApiKey(id,label){ ... }
+
+// ── WEBHOOKS — commented out for now ─────────────────────────────────────────
+// async function loadWebhooks(){ ... }
+// async function createWebhook(){ ... }
+// async function toggleWebhook(id,enabled){ ... }
+// async function deleteWebhook(id,label){ ... }
+
+// ── Token modal ───────────────────────────────────────────────────────────────
+function copyToken(){navigator.clipboard.writeText(document.getElementById('token-display').textContent).then(()=>toast('Copied.','ok')).catch(()=>toast('Copy failed.','err'));}
+function closeTokenModal(){document.getElementById('token-modal').classList.remove('open');}
+
+init();
+</script>
+</body>
+</html>

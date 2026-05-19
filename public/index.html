@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>KiKxxl-evroTarget — Organization Chart</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4ff;--surface:#fff;--border:#dde3f0;--text:#111827;--muted:#6b7280;--accent:#1d4ed8;--teal:#0f766e;--font:'Outfit',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 6px rgba(0,0,0,.06);position:sticky;top:0;z-index:300;}
+.brand{display:flex;align-items:center;gap:.65rem;}
+.badge{background:var(--accent);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.07em;padding:.22rem .55rem;border-radius:5px;text-transform:uppercase;white-space:nowrap;}
+.brand-name{font-size:1rem;font-weight:700;color:var(--text);}
+.btn{padding:.38rem .9rem;border-radius:7px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .13s;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;}
+.btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:#1e40af;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}.btn-ghost:hover{color:var(--text);}
+.role-tag{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:4px;}
+.role-tag.admin{background:#fef3c7;color:#92400e;}
+.role-tag.editor{background:#dbeafe;color:#1d4ed8;}
+.role-tag.viewer{background:#f1f5f9;color:#475569;}
+.role-tag.developer{background:#f0fdf4;color:#0f766e;}
+.role-tag.superadmin{background:#fae8ff;color:#7e22ce;}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 1.5rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0;flex-wrap:wrap;}
+.toolbar input{padding:.36rem .7rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:.83rem;color:var(--text);outline:none;width:200px;background:var(--bg);}
+.toolbar input:focus{border-color:var(--accent);background:#fff;}
+.hint{font-size:.75rem;color:#9ca3af;margin-left:auto;}
+
+.layout-toggle{display:inline-flex;border:1px solid var(--border);border-radius:7px;background:#fff;overflow:hidden;}
+.layout-toggle .lt-btn{border:none;background:transparent;padding:.3rem .65rem;font-family:var(--font);font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;border-right:1px solid var(--border);white-space:nowrap;}
+.layout-toggle .lt-btn:last-child{border-right:none;}
+.layout-toggle .lt-btn:hover{color:var(--text);background:#f8fafc;}
+.layout-toggle .lt-btn.active{background:var(--accent);color:#fff;}
+.page{display:flex;flex:1;position:relative;}
+#chart-wrap{flex:1;overflow:auto;padding:3rem 2rem 4rem;display:flex;justify-content:flex-start;align-items:flex-start;min-width:0;}
+#chart-wrap>*{margin:0 auto;min-width:max-content;}
+/* Tree connectors — clearer, more defined hierarchy lines */
+.subtree{display:flex;flex-direction:column;align-items:center;}
+.subtree-children{display:flex;flex-direction:column;align-items:center;}
+.children-row{display:flex;gap:2.5rem;align-items:flex-start;position:relative;padding-top:1.1rem;}
+.children-row::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2.5px;height:1.1rem;background:#64748b;border-radius:2px;}
+.children-row.multi::after{content:'';position:absolute;top:1.1rem;left:0;right:0;height:2.5px;background:#64748b;border-radius:2px;}
+.child-col{display:flex;flex-direction:column;align-items:center;position:relative;padding-top:1.1rem;}
+.child-col::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2.5px;height:1.1rem;background:#64748b;border-radius:2px;}
+.connector-down{width:2.5px;height:1.4rem;background:#64748b;border-radius:2px;flex-shrink:0;}
+/* Vertical (stacked) children layout — used when 3+ siblings of equal rank */
+.children-row.vertical{flex-direction:column;align-items:flex-start;gap:.95rem;padding-top:1.1rem;padding-left:1.5rem;}
+.children-row.vertical::after{display:none;}
+.children-row.vertical::before{top:0;left:1.5rem;transform:none;width:2.5px;height:calc(100% - .95rem);background:#64748b;border-radius:2px;}
+.children-row.vertical>.child-col{padding-top:0;padding-left:1.5rem;align-items:flex-start;}
+.children-row.vertical>.child-col::before{top:50%;left:0;transform:translateY(-50%);width:1.5rem;height:2.5px;background:#64748b;border-radius:2px;}
+/* Employee card */
+.node-card{width:220px;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);transition:box-shadow .2s,border-color .2s;user-select:none;flex-shrink:0;}
+.node-card:hover{box-shadow:0 5px 20px rgba(29,78,216,.12);}
+.node-card.expanded{border-color:var(--accent);box-shadow:0 8px 28px rgba(29,78,216,.18);}
+.card-stripe{height:5px;}
+.card-header{padding:.75rem .9rem .6rem;display:flex;gap:.65rem;align-items:flex-start;cursor:pointer;}
+.card-header:hover{background:#fafbff;}
+.card-avatar{width:38px;height:38px;border-radius:10px;flex-shrink:0;border:2px solid #e0e7ff;transition:width .25s,height .25s;}
+.node-card.expanded .card-avatar{width:50px;height:50px;}
+.card-text{flex:1;min-width:0;}
+.card-title{font-size:.83rem;font-weight:700;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.node-card.expanded .card-title{-webkit-line-clamp:unset;overflow:visible;}
+.card-name{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.2rem;}
+.node-card.expanded .card-name{white-space:normal;}
+.card-dept{display:inline-flex;align-items:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.15rem .45rem;border-radius:4px;cursor:pointer;border:none;font-family:var(--font);margin-top:.25rem;}
+.card-dept:hover{box-shadow:0 0 0 2px currentColor;}
+.proj-chips{display:flex;flex-wrap:wrap;gap:.2rem;margin-top:.25rem;}
+.proj-chip{display:inline-flex;align-items:center;gap:.2rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.1rem .35rem;border-radius:4px;background:#ccfbf1;color:#0f766e;cursor:pointer;border:1px solid transparent;}
+.proj-chip:hover{border-color:#0f766e;}
+.proj-chip.primary{background:#0f766e;color:#fff;}
+.div-chips{display:flex;flex-wrap:wrap;gap:.2rem;margin-top:.2rem;}
+.div-chip{display:inline-flex;align-items:center;gap:.2rem;font-size:.58rem;font-weight:700;letter-spacing:.04em;padding:.1rem .35rem;border-radius:4px;background:#ede9fe;color:#6d28d9;border:1px solid transparent;}
+/* Project employees: double-outline visual style — distinct from dept employees */
+.node-card.project-employee{border:1.5px solid var(--border);outline:2px solid var(--surface);outline-offset:2px;box-shadow:0 0 0 1.5px var(--border),0 2px 10px rgba(0,0,0,.07);}
+.node-card.project-employee:hover{box-shadow:0 0 0 1.5px #0f766e,0 5px 20px rgba(15,118,110,.18);}
+.node-card.project-employee.expanded{box-shadow:0 0 0 1.5px var(--accent),0 8px 28px rgba(29,78,216,.18);}
+/* Faded state for non-members when a dept/project panel is open */
+.node-card.faded{opacity:.28;transition:opacity .2s;}
+.node-card.faded:hover{opacity:.55;}
+/* Division name line under the dept badge on the card */
+.card-div-line{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem;margin-top:.18rem;font-size:.66rem;font-weight:700;letter-spacing:.02em;line-height:1.1;}
+.card-div-line .div-name{display:inline-flex;align-items:center;}
+.card-div-line .div-sep{color:#cbd5e1;font-weight:400;}
+/* Division group cluster header */
+.division-group{align-items:center;}
+.division-group-head{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border:1.5px solid;border-radius:100px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:#fff;}
+.division-group-dot{width:8px;height:8px;border-radius:50%;}
+.division-group-count{background:rgba(0,0,0,.08);color:inherit;padding:.05rem .4rem;border-radius:100px;font-size:.62rem;}
+.loc-tag{display:inline-flex;align-items:center;gap:.2rem;font-size:.6rem;font-weight:600;padding:.1rem .38rem;border-radius:3px;background:#f1f5f9;color:#475569;margin-top:.22rem;white-space:nowrap;}
+.card-detail{max-height:0;overflow:hidden;transition:max-height .35s,opacity .25s;opacity:0;}
+.node-card.expanded .card-detail{max-height:800px;opacity:1;}
+.card-detail-inner{padding:.1rem .9rem .85rem;border-top:1px solid #eef0fb;}
+.d-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-top:.7rem;margin-bottom:.3rem;}
+.d-row{display:flex;gap:.45rem;align-items:flex-start;font-size:.78rem;color:var(--text);margin-bottom:.28rem;line-height:1.4;}
+.d-row a{color:var(--accent);text-decoration:none;}
+.d-bio{font-size:.78rem;color:#374151;line-height:1.65;}
+.email-extra{font-size:.72rem;color:var(--muted);margin-top:.15rem;padding-left:1.05rem;}
+.email-extra a{color:var(--muted) !important;}
+.email-label{display:inline-block;font-size:.6rem;font-weight:600;color:#94a3b8;background:#f1f5f9;padding:.05rem .3rem;border-radius:3px;margin-left:.3rem;}
+.card-expand-toggle{text-align:center;font-size:.63rem;color:#a5b4fc;padding:.25rem 0 .3rem;border-top:1px solid #f1f5f9;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.3rem;}
+.card-expand-toggle:hover{background:#f5f7ff;color:var(--accent);}
+.arrow{display:inline-block;transition:transform .25s;}
+.node-card.expanded .arrow{transform:rotate(180deg);}
+.card-tree-toggle{text-align:center;font-size:.62rem;color:#c7d2fe;padding:.2rem 0 .26rem;border-top:1px dashed #e0e7ff;cursor:pointer;}
+.card-tree-toggle:hover{background:#f0f4ff;color:var(--accent);}
+/* Virtual / Leadership node */
+.virtual-node{width:240px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(49,46,129,.35);flex-shrink:0;}
+.virtual-node-inner{padding:.85rem 1rem;display:flex;align-items:center;gap:.7rem;}
+.virtual-node-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;}
+.virtual-node-name{font-size:.95rem;font-weight:700;color:#fff;line-height:1.2;}
+.virtual-node-sub{font-size:.7rem;color:rgba(255,255,255,.6);margin-top:.12rem;}
+/* Department pass-through node */
+.dept-node{width:220px;background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);flex-shrink:0;cursor:pointer;transition:box-shadow .2s;}
+.dept-node:hover{box-shadow:0 5px 22px rgba(0,0,0,.14);}
+.dept-node-stripe{height:5px;}
+.dept-node-inner{padding:.65rem .85rem;display:flex;align-items:center;gap:.6rem;}
+.dept-node-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;}
+.dept-node-name{font-size:.88rem;font-weight:700;line-height:1.2;}
+.dept-node-sub{font-size:.68rem;color:var(--muted);margin-top:.1rem;}
+/* Operations pass-through (structural, no employees) */
+.ops-node{width:220px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(15,118,110,.1);flex-shrink:0;cursor:default;}
+.ops-node-inner{padding:.65rem .85rem;display:flex;align-items:center;gap:.6rem;}
+.ops-node-icon{width:36px;height:36px;border-radius:9px;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;}
+.ops-node-name{font-size:.88rem;font-weight:700;color:var(--teal);line-height:1.2;}
+.ops-node-sub{font-size:.68rem;color:var(--muted);margin-top:.1rem;}
+/* Project node */
+.project-node{width:220px;background:linear-gradient(135deg,#f0fdf4,#ccfbf1);border:2.5px dashed #0f766e;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(15,118,110,.12);cursor:pointer;flex-shrink:0;transition:box-shadow .2s;}
+.project-node:hover{box-shadow:0 5px 22px rgba(15,118,110,.22);}
+.project-node-stripe{height:6px;background:repeating-linear-gradient(90deg,#0f766e 0,#0f766e 8px,transparent 8px,transparent 14px);}
+.project-node-inner{padding:.7rem .85rem;display:flex;align-items:center;gap:.65rem;}
+.project-node-icon{width:42px;height:42px;border-radius:10px;background:#0f766e;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:1.05rem;}
+.project-node-name{font-size:.95rem;font-weight:700;color:#0f766e;line-height:1.2;}
+.project-node-sub{font-size:.7rem;color:#6b7280;margin-top:.18rem;}
+.pc-status{display:inline-block;font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.08rem .35rem;border-radius:3px;margin-left:.3rem;}
+.pc-status.active{background:#dcfce7;color:#166534;}
+.pc-status.onboarding{background:#fef9c3;color:#854d0e;}
+.pc-status.paused{background:#fde68a;color:#92400e;}
+.pc-status.ended{background:#fecaca;color:#991b1b;}
+/* Division node */
+.division-node{width:220px;border-radius:13px;overflow:hidden;box-shadow:0 2px 10px rgba(99,102,241,.12);flex-shrink:0;}
+.division-node-stripe{height:4px;}
+.division-node-inner{padding:.6rem .8rem;display:flex;align-items:center;gap:.55rem;background:linear-gradient(135deg,#fafafa,#f5f3ff);}
+.division-node-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;}
+.division-node-name{font-size:.84rem;font-weight:700;line-height:1.2;}
+.division-node-sub{font-size:.66rem;color:var(--muted);margin-top:.1rem;}
+/* Location sub-node */
+.location-node{width:220px;background:linear-gradient(135deg,#f8faff,#eff6ff);border:2px solid #93c5fd;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(29,78,216,.08);flex-shrink:0;}
+.location-node-inner{padding:.6rem .85rem;display:flex;align-items:center;gap:.6rem;}
+.location-node-icon{width:34px;height:34px;border-radius:8px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);font-size:.9rem;}
+.location-node-name{font-size:.85rem;font-weight:700;color:var(--accent);line-height:1.2;}
+.location-node-sub{font-size:.68rem;color:var(--muted);margin-top:.12rem;}
+/* Dropdowns */
+.dd-wrap{position:relative;flex-shrink:0;}
+.dd-btn{display:flex;align-items:center;gap:.35rem;padding:.36rem .75rem;border:1px solid var(--border);border-radius:7px;background:#fff;font-family:var(--font);font-size:.82rem;font-weight:500;color:var(--text);cursor:pointer;white-space:nowrap;}
+.dd-btn:hover{border-color:#94a3b8;}
+.dd-btn.active{border-color:var(--accent);color:var(--accent);}
+.dd-menu{display:none;flex-direction:column;position:absolute;top:calc(100% + 4px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.11);min-width:230px;max-height:340px;z-index:400;overflow:hidden;}
+.dd-menu.open{display:flex;}
+.dd-head{padding:.55rem .85rem;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;border-bottom:1px solid var(--border);}
+.dd-items-scroll{overflow-y:auto;flex:1;}
+.dd-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .85rem;cursor:pointer;font-size:.83rem;color:var(--text);}
+.dd-item:hover{background:#f8fafc;}
+.dd-item.checked{background:#eff6ff;}
+.dd-check{width:14px;height:14px;border:1.5px solid #cbd5e1;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--accent);opacity:0;background:#fff;}
+.dd-item.checked .dd-check{opacity:1;border-color:var(--accent);background:#eff6ff;}
+.dd-item.indeterminate .dd-check{opacity:1;border-color:var(--accent);background:#eff6ff;font-size:0;position:relative;}
+.dd-item.indeterminate .dd-check::after{content:'';display:block;width:8px;height:2px;background:var(--accent);border-radius:1px;}
+.dd-item.country-group{font-weight:700;background:#f8fafc;border-bottom:1px solid var(--border);}
+.dd-item.country-group.checked{background:#dbeafe;}
+.dd-country-count{font-size:.7rem;color:#94a3b8;margin-left:auto;padding-right:.25rem;}
+.dd-loc-child{padding-left:1.6rem;}
+.dd-foot{padding:.5rem .85rem;border-top:1px solid var(--border);display:flex;gap:.5rem;}
+.dd-link{font-size:.75rem;font-weight:600;color:var(--accent);cursor:pointer;background:none;border:none;font-family:var(--font);}
+.dd-link:hover{text-decoration:underline;}
+/* Panels */
+#panel-dept,#panel-project{position:fixed;top:56px;right:0;width:340px;height:calc(100vh - 56px);background:var(--surface);border-left:1px solid var(--border);box-shadow:-4px 0 24px rgba(0,0,0,.09);transform:translateX(100%);transition:transform .25s;z-index:200;display:flex;flex-direction:column;overflow:hidden;}
+#panel-dept.open,#panel-project.open{transform:translateX(0);}
+#panel-detail{position:fixed;top:56px;right:340px;width:320px;height:calc(100vh - 56px);background:#f8faff;border-left:1px solid var(--border);box-shadow:-4px 0 18px rgba(0,0,0,.07);transform:translateX(calc(100% + 340px));transition:transform .25s;z-index:199;display:flex;flex-direction:column;overflow:hidden;}
+#panel-detail.open{transform:translateX(0);}
+#panel-detail-2{position:fixed;top:56px;right:660px;width:320px;height:calc(100vh - 56px);background:#f4f7ff;border-left:1px solid var(--border);box-shadow:-4px 0 14px rgba(0,0,0,.05);transform:translateX(calc(100% + 660px));transition:transform .25s;z-index:198;display:flex;flex-direction:column;overflow:hidden;}
+#panel-detail-2.open{transform:translateX(0);}
+.panel-head{padding:1rem 1.1rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.panel-head-left{display:flex;align-items:center;gap:.6rem;flex:1;min-width:0;}
+.panel-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.1rem .3rem;border-radius:5px;}
+.panel-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.panel-title-text{font-size:.95rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.panel-subtitle{font-size:.75rem;color:var(--muted);margin-top:.05rem;}
+.panel-body{flex:1;overflow-y:auto;}
+.p-section{padding:.85rem 1.1rem;border-bottom:1px solid #eef2f8;}
+.p-section:last-child{border-bottom:none;}
+.p-sec-label{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.6rem;}
+.p-desc{font-size:.82rem;color:#374151;line-height:1.68;}
+.panel-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .4rem;border-radius:7px;cursor:pointer;border-bottom:1px solid #f1f5f9;}
+.panel-item:hover{background:#eff6ff;}
+.item-badge{font-size:.68rem;font-weight:700;padding:.2rem .5rem;border-radius:5px;background:#1d4ed820;color:var(--accent);white-space:nowrap;flex-shrink:0;}
+.item-label{font-size:.82rem;color:var(--text);flex:1;}
+.item-count{font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:100px;background:#e0e7ff;color:var(--accent);}
+.item-arrow{font-size:.7rem;color:#a5b4fc;}
+.rel-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.member-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid #f1f5f9;}
+.member-row img{width:30px;height:30px;border-radius:7px;}
+.member-row strong{font-size:.82rem;display:block;}
+.ev-detail-row{display:flex;gap:.7rem;padding:.35rem 0;font-size:.85rem;color:var(--text);border-bottom:1px solid #f1f5f9;}
+.ev-detail-row strong{min-width:100px;color:#475569;font-weight:600;font-size:.82rem;flex-shrink:0;}
+.member-row span{font-size:.72rem;color:var(--muted);}
+.detail-body{font-size:.82rem;color:#374151;line-height:1.7;}
+.ext-link{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--accent);text-decoration:none;font-weight:600;padding:.35rem .75rem;border:1px solid #bfdbfe;border-radius:7px;margin-top:.75rem;}
+.rel-section-icon{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;}
+#filter-banner{display:none;align-items:center;gap:.55rem;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.3rem .7rem;font-size:.8rem;font-weight:500;color:#1d4ed8;}
+#filter-banner.visible{display:flex;}
+#filter-banner .clear-btn{background:none;border:none;cursor:pointer;color:#1d4ed8;font-weight:700;}
+.empty-chart{padding:4rem 1rem;text-align:center;color:#9ca3af;font-size:.9rem;max-width:480px;}
+.empty-chart strong{display:block;color:#475569;font-size:1.05rem;margin-bottom:.4rem;}
+.empty-chart a{color:var(--accent);font-weight:600;text-decoration:none;}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:9999;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:14px;width:380px;max-width:90vw;padding:1.4rem 1.5rem;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.modal h2{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
+.modal .field{display:flex;flex-direction:column;gap:.27rem;margin-bottom:.7rem;}
+.modal label{font-size:.76rem;font-weight:600;color:#374151;}
+.modal input{padding:.45rem .68rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:.87rem;}
+.modal input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #dbeafe;outline:none;}
+.modal-foot{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.1rem;}
+.modal-error{font-size:.78rem;color:#dc2626;margin-top:.3rem;display:none;}
+.modal-error.visible{display:block;}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.7rem 1.1rem;border-radius:9px;font-size:.84rem;font-weight:500;display:none;z-index:9999;}
+</style>
+</head>
+<body>
+
+<header>
+<div class="brand"><span class="badge">KiKxxl-evroTarget</span><span class="brand-name">Organization Chart</span></div>
+<div style="display:flex;gap:.6rem;align-items:center">
+<span id="emp-count" style="font-size:.8rem;color:var(--muted)"></span>
+<span id="role-tag" class="role-tag" style="display:none"></span>
+<span id="user-badge" style="font-size:.78rem;color:var(--muted);background:#f1f5f9;padding:.25rem .6rem;border-radius:6px;display:none"></span>
+<button class="btn btn-ghost" id="pwd-btn" style="display:none" onclick="openPwdModal()" title="Change password">🔑</button>
+<a href="/admin.html" class="btn btn-primary" id="admin-link" style="display:none">⚙ Manage</a>
+<button class="btn btn-ghost" id="logout-btn" style="display:none" onclick="logout()">Sign out</button>
+</div>
+</header>
+
+<div class="toolbar">
+<input id="search" type="text" placeholder="🔍  Search…" autocomplete="off"/>
+<button class="btn btn-ghost" id="btn-tree-toggle" onclick="toggleTreeCollapsed()">Collapse all</button>
+<div class="dd-wrap" id="dd-dept-wrap"><button class="dd-btn" id="dd-dept-btn" onclick="toggleDD('dept')"><span id="dd-dept-label">Departments</span></button><div class="dd-menu" id="dd-dept-menu"><div class="dd-head">Filter by department</div><div id="dd-dept-items"></div><div class="dd-foot"><button class="dd-link" onclick="ddSelectAll('dept')">All</button><button class="dd-link" onclick="ddSelectNone('dept')">None</button></div></div></div>
+<div class="dd-wrap" id="dd-proj-wrap"><button class="dd-btn" id="dd-proj-btn" onclick="toggleDD('proj')"><span id="dd-proj-label">Projects</span></button><div class="dd-menu" id="dd-proj-menu"><div class="dd-head">Filter by client project</div><div id="dd-proj-items"></div><div class="dd-foot"><button class="dd-link" onclick="ddSelectAll('proj')">All</button><button class="dd-link" onclick="ddSelectNone('proj')">None</button></div></div></div>
+<div class="dd-wrap" id="dd-loc-wrap"><button class="dd-btn" id="dd-loc-btn" onclick="toggleDD('loc')"><span id="dd-loc-label">Locations</span></button><div class="dd-menu" id="dd-loc-menu"><div class="dd-head">Filter by location</div><div id="dd-loc-items"></div><div class="dd-foot"><button class="dd-link" onclick="ddSelectAll('loc')">All</button><button class="dd-link" onclick="ddSelectNone('loc')">None</button></div></div></div>
+
+<div class="layout-toggle" id="layout-toggle" title="Layout: Auto stacks vertically when many siblings · Horizontal forces side-by-side · Vertical forces stacked">
+  <button type="button" data-mode="auto" class="lt-btn active" onclick="setLayoutMode('auto')">Auto</button>
+  <button type="button" data-mode="horizontal" class="lt-btn" onclick="setLayoutMode('horizontal')">↔ Horizontal</button>
+  <button type="button" data-mode="vertical" class="lt-btn" onclick="setLayoutMode('vertical')">↕ Vertical</button>
+</div>
+<div id="filter-banner"><span id="filter-label"></span><button class="clear-btn" onclick="clearIsolation()">✕ Show all</button></div>
+<span class="hint">Click card to expand · dept badge → info · ◆ chip → project info</span>
+</div>
+
+<div class="page"><div id="chart-wrap"><div id="chart"></div></div></div>
+
+<div id="panel-dept"><div class="panel-head"><div class="panel-head-left"><div class="panel-dot" id="dp-dot"></div><div><div class="panel-title-text" id="dp-name"></div><div class="panel-subtitle" id="dp-subtitle"></div></div></div><button class="panel-close" onclick="closeDeptPanel()">✕</button></div><div class="panel-body" id="dp-body"></div></div>
+<div id="panel-project"><div class="panel-head"><div class="panel-head-left"><div class="panel-dot" id="pp-dot"></div><div><div class="panel-title-text" id="pp-name"></div><div class="panel-subtitle" id="pp-subtitle"></div></div></div><button class="panel-close" onclick="closeProjectPanel()">✕</button></div><div class="panel-body" id="pp-body"></div></div>
+<div id="panel-detail"><div class="panel-head"><div class="panel-head-left"><div class="panel-dot" id="dd-dot" style="display:none"></div><div><div class="panel-title-text" id="dd-title"></div><div class="panel-subtitle" id="dd-subtitle"></div></div></div><button class="panel-close" onclick="closeDetailPanel()">✕</button></div><div class="panel-body" id="dd-body"></div></div>
+<div id="panel-detail-2"><div class="panel-head"><div class="panel-head-left"><div class="panel-dot" id="d2-dot" style="display:none"></div><div><div class="panel-title-text" id="d2-title"></div><div class="panel-subtitle" id="d2-subtitle"></div></div></div><button class="panel-close" onclick="closeDetail2Panel()">✕</button></div><div class="panel-body" id="d2-body"></div></div>
+
+<div class="modal-bg" id="pwd-modal">
+<div class="modal">
+<h2>Change your password</h2>
+<div class="field"><label>Current password</label><input id="pwd-current" type="password"/></div>
+<div class="field"><label>New password (min. 6 characters)</label><input id="pwd-new" type="password"/></div>
+<div class="field"><label>Confirm new password</label><input id="pwd-confirm" type="password"/></div>
+<div class="modal-error" id="pwd-error"></div>
+<div class="modal-foot"><button class="btn btn-ghost" onclick="closePwdModal()">Cancel</button><button class="btn btn-primary" onclick="submitPwdChange()">Update password</button></div>
+</div>
+</div>
+<div id="toast"></div>
+
+<script>
+let allNodes=[],allProjects=[],allDepts=[],allLocs=[],allDivisions=[],countryGroups=[],allDeptsRaw=[];
+const APP_VERSION='2026-05-07-v9';
+console.log('[OrgChart] Loaded version:',APP_VERSION);
+let opsDeptId=null;
+let primaryProjectByEmp={},projectChildrenByProj={};
+let divisionsByProject={},divisionsByDept={},divisionChildren={};
+let deptHeadByDept={},projectHeadByProject={};
+let panelFadeDeptId=null,panelFadeProjectId=null; // when set, non-members of this dept/project fade in chart
+let expandedCards=new Set(),collapsedTree=new Set();
+let isolation=null,currentRole=null,currentUsername=null;
+let searchDirectMatches=new Set(),searchAncestorChain=new Set(),searchMatchedProjects=new Set();
+let hiddenDepts=new Set(),hiddenProjects=new Set(),hiddenLocs=new Set();
+let layoutMode='auto'; // 'auto' | 'horizontal' | 'vertical' — auto stacks vertically when child count is high
+const VERTICAL_THRESHOLD=3; // auto mode: 3 or more siblings of equal rank → stack vertically
+
+// ── Per-user view preferences (localStorage, keyed by username) ─────────────
+// Only the layout direction (Auto / Horizontal / Vertical) is remembered per
+// user. Hidden-dept/project/location filters
+// reset on every visit — saving them caused users to come back to a chart
+// that looked empty because of stale filters.
+function prefKey(){return currentUsername?`orgchart_prefs_${currentUsername}`:null;}
+function loadPrefs(){
+  const k=prefKey();if(!k) return;
+  try{
+    const raw=localStorage.getItem(k);if(!raw) return;
+    const p=JSON.parse(raw);
+    if(p.layoutMode&&['auto','horizontal','vertical'].includes(p.layoutMode)) layoutMode=p.layoutMode;
+  }catch(e){/* ignore corrupted prefs */}
+}
+function savePrefs(){
+  const k=prefKey();if(!k) return;
+  try{
+    localStorage.setItem(k,JSON.stringify({layoutMode}));
+  }catch(e){/* ignore quota errors */}
+}
+
+// Decide whether a row of N children should render vertically.
+// The layoutMode toggle ONLY affects rows directly under:
+//   • a department head's card (non-Operations)
+//   • a department tile (when no head) — only one such row is rendered, the dept's members
+//   • a client project head's card
+//   • a client project tile (when no head)
+// Every other row in the tree is forced horizontal regardless of layoutMode.
+function shouldStackVertically(n){
+  if(layoutMode==='vertical') return n>1; // a single child looks the same either way
+  if(layoutMode==='horizontal') return false;
+  return n>=VERTICAL_THRESHOLD; // auto
+}
+// Build the className string for a children-row.
+// `respectLayoutMode=true` lets the layoutMode toggle apply to this row.
+// Default is HORIZONTAL — only specific structural rows opt in.
+function rowClass(n,respectLayoutMode){
+  let c='children-row';
+  if(n>1) c+=' multi';
+  if(respectLayoutMode&&shouldStackVertically(n)) c+=' vertical';
+  return c;
+}
+function setLayoutMode(mode){
+  if(!['auto','horizontal','vertical'].includes(mode)) return;
+  layoutMode=mode;
+  document.querySelectorAll('#layout-toggle .lt-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.mode===mode);
+  });
+  savePrefs();
+  renderChart(document.getElementById('search').value.trim()||undefined);
+}
+
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+const LANG_CODE_MAP={'en':'English','de':'German','fr':'French','it':'Italian','es':'Spanish','pt':'Portuguese','nl':'Dutch','sv':'Swedish','no':'Norwegian','da':'Danish','fi':'Finnish','pl':'Polish','cs':'Czech','ro':'Romanian','el':'Greek','tr':'Turkish','ar':'Arabic'};
+function normalizeLang(s){const t=s.trim(),m=LANG_CODE_MAP[t.toLowerCase()];return m||t;}
+function cssSafe(s){return s.replace(/[^a-z0-9]/gi,'_');}
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.style.cssText=`position:fixed;bottom:1.5rem;right:1.5rem;padding:.7rem 1.1rem;border-radius:9px;font-size:.84rem;font-weight:500;display:block;z-index:9999;${type==='ok'?'background:#f0fdf4;border:1px solid #86efac;color:#166534;':'background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;'}`;clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3000);}
+async function logout(){await fetch('/auth/logout',{method:'POST'});window.location.href='/login.html';}
+function openPwdModal(){document.getElementById('pwd-modal').classList.add('open');['pwd-current','pwd-new','pwd-confirm'].forEach(id=>document.getElementById(id).value='');document.getElementById('pwd-error').classList.remove('visible');document.getElementById('pwd-current').focus();}
+function closePwdModal(){document.getElementById('pwd-modal').classList.remove('open');}
+async function submitPwdChange(){const cur=document.getElementById('pwd-current').value,nw=document.getElementById('pwd-new').value,cf=document.getElementById('pwd-confirm').value;const err=document.getElementById('pwd-error');err.classList.remove('visible');if(!cur||!nw||!cf){err.textContent='All fields required.';err.classList.add('visible');return;}if(nw.length<6){err.textContent='Min. 6 characters.';err.classList.add('visible');return;}if(nw!==cf){err.textContent='Passwords do not match.';err.classList.add('visible');return;}const r=await fetch('/api/me/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:cur,new_password:nw})});if(!r.ok){const d=await r.json().catch(()=>({error:'Failed'}));err.textContent=d.error||'Failed';err.classList.add('visible');return;}closePwdModal();toast('Password updated.','ok');}
+
+
+async function init(){
+  try{const res=await fetch('/api/me',{credentials:'same-origin'});if(res.ok){const data=await res.json();if(data&&data.user){currentRole=data.user.role||'viewer';currentUsername=data.user.username||null;document.getElementById('user-badge').textContent=data.user.username;document.getElementById('user-badge').style.display='inline';document.getElementById('logout-btn').style.display='inline-flex';document.getElementById('pwd-btn').style.display='inline-flex';const rt=document.getElementById('role-tag');rt.textContent=currentRole;rt.className='role-tag '+currentRole;rt.style.display='inline-block';if(['editor','admin','developer','superadmin'].includes(currentRole)) document.getElementById('admin-link').style.display='inline-flex';}else{window.location.href='/login.html';return;}}else if(res.status===401){window.location.href='/login.html';return;}else{currentRole='viewer';}}catch(e){currentRole='viewer';}
+
+  // Load this user's saved layout preference (only the layout direction is
+  // remembered across sessions). Re-saving overwrites any stale legacy keys
+  // that previously stored hidden-filter sets.
+  loadPrefs();
+  savePrefs();
+
+  const [chart,proj,loc,depts,divs]=await Promise.all([
+    fetch('/api/orgchart').then(r=>r.json()),
+    fetch('/api/client-projects').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/locations').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/departments').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/divisions').then(r=>r.json()).catch(()=>[]),
+  ]);
+  allNodes=chart;allProjects=proj;allDivisions=divs;allDeptsRaw=depts;
+  allLocs=loc.sort((a,b)=>{const cA=(a.country||'').toLowerCase(),cB=(b.country||'').toLowerCase();if(cA!==cB)return cA.localeCompare(cB);return a.name.localeCompare(b.name);});
+  document.getElementById('emp-count').textContent=allNodes.filter(n=>!n.is_virtual).length+' employees';
+
+  const opsDept=depts.find(d=>d.name&&d.name.toLowerCase()==='operations');
+  opsDeptId=opsDept?opsDept.id:null;
+
+  // Build project/employee maps
+  primaryProjectByEmp={};projectChildrenByProj={};
+  allNodes.forEach(n=>{if(!n.projects||!n.projects.length)return;const primary=n.projects.find(p=>p.is_primary)||n.projects[0];primaryProjectByEmp[n.id]=primary.project_id;if(!projectChildrenByProj[primary.project_id]) projectChildrenByProj[primary.project_id]=[];projectChildrenByProj[primary.project_id].push(n.id);});
+
+  // Build head lookups: { deptId -> head_employee_id, projectId -> head_employee_id }
+  deptHeadByDept={};projectHeadByProject={};
+  depts.forEach(d=>{if(d.head_employee_id) deptHeadByDept[d.id]=d.head_employee_id;});
+  proj.forEach(p=>{if(p.head_employee_id) projectHeadByProject[p.id]=p.head_employee_id;});
+
+  // Build division maps (top-level only — parent_division_id IS NULL)
+  divisionsByProject={};divisionsByDept={};divisionChildren={};
+  allDivisions.forEach(d=>{
+    if(d.project_id){if(!divisionsByProject[d.project_id]) divisionsByProject[d.project_id]=[];divisionsByProject[d.project_id].push(d);}
+    else if(d.department_id){if(!divisionsByDept[d.department_id]) divisionsByDept[d.department_id]=[];divisionsByDept[d.department_id].push(d);}
+  });
+
+  // Note: deep tree starts fully expanded; user can toggle Collapse all via toolbar.
+  const dseen=new Map();allNodes.forEach(n=>{if(n.dept_id&&!dseen.has(n.dept_id)) dseen.set(n.dept_id,{id:n.dept_id,name:n.dept,color:n.dept_color});});
+  allDepts=[...dseen.values()].sort((a,b)=>a.name.localeCompare(b.name));
+  const byCountry=new Map();allLocs.forEach(l=>{const c=(l.country||'').trim();if(!c)return;if(!byCountry.has(c)) byCountry.set(c,[]);byCountry.get(c).push(l.id);});
+  countryGroups=[...byCountry.entries()].filter(([_,ids])=>ids.length>=2).map(([country,locIds])=>({country,locIds})).sort((a,b)=>a.country.localeCompare(b.country));
+  // Reflect loaded layout pref on the toolbar before the first render
+  document.querySelectorAll('#layout-toggle .lt-btn').forEach(b=>{b.classList.toggle('active',b.dataset.mode===layoutMode);});
+  // Clear the search input — browsers sometimes autofill it with the username
+  document.getElementById('search').value='';
+  buildDropdowns();renderChart();
+}
+
+function buildDropdowns(){
+  document.getElementById('dd-dept-items').innerHTML=allDepts.length===0?`<div style="padding:.85rem;color:#9ca3af;font-size:.78rem;text-align:center">No departments yet.</div>`:`<div class="dd-items-scroll">`+allDepts.map(d=>`<div class="dd-item checked" id="ddi-dept-${d.id}"><div style="width:9px;height:9px;border-radius:50%;background:${d.color}"></div><span style="flex:1">${escapeHtml(d.name)}</span><span class="dd-check">✓</span></div>`).join('')+`</div>`;
+  allDepts.forEach(d=>{const el=document.getElementById('ddi-dept-'+d.id);if(el)el.addEventListener('click',()=>toggleDDItem('dept',d.id));});
+  document.getElementById('dd-proj-items').innerHTML=allProjects.length===0?`<div style="padding:.85rem;color:#9ca3af;font-size:.78rem;text-align:center">No projects yet.</div>`:`<div class="dd-items-scroll">`+allProjects.map(p=>`<div class="dd-item checked" id="ddi-proj-${p.id}"><span style="color:${p.color};font-size:.75rem">◆</span><span style="flex:1">${escapeHtml(p.name)}</span><span class="dd-check">✓</span></div>`).join('')+`</div>`;
+  allProjects.forEach(p=>{const el=document.getElementById('ddi-proj-'+p.id);if(el)el.addEventListener('click',()=>toggleDDItem('proj',p.id));});
+  if(allLocs.length===0){document.getElementById('dd-loc-items').innerHTML=`<div style="padding:.85rem;color:#9ca3af;font-size:.78rem;text-align:center">No locations yet.</div>`;}
+  else{const grouped=new Set(countryGroups.map(g=>g.country));const seen=new Set();let html='<div class="dd-items-scroll">';allLocs.forEach(l=>{const c=(l.country||'').trim();if(c&&grouped.has(c)&&!seen.has(c)){seen.add(c);const g=countryGroups.find(x=>x.country===c);html+=`<div class="dd-item country-group checked" id="ddi-country-${cssSafe(c)}"><span style="font-size:.85rem">🌐</span><span style="flex:1">${escapeHtml(c)}</span><span class="dd-country-count">${g.locIds.length}</span><span class="dd-check">✓</span></div>`;}const indent=(c&&grouped.has(c))?' dd-loc-child':'';html+=`<div class="dd-item checked${indent}" id="ddi-loc-${l.id}"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="flex:1">${escapeHtml(l.name)}${l.country?', '+escapeHtml(l.country):''}</span><span class="dd-check">✓</span></div>`;});html+='</div>';document.getElementById('dd-loc-items').innerHTML=html;allLocs.forEach(l=>{const el=document.getElementById('ddi-loc-'+l.id);if(el)el.addEventListener('click',()=>toggleDDItem('loc',l.id));});countryGroups.forEach(g=>{const el=document.getElementById('ddi-country-'+cssSafe(g.country));if(el)el.addEventListener('click',()=>toggleCountryGroup(g.country));});}
+  updateDDLabel('dept');updateDDLabel('proj');updateDDLabel('loc');
+}
+
+function toggleDD(type){['dept','proj','loc'].forEach(t=>{if(t!==type){document.getElementById('dd-'+t+'-menu').classList.remove('open');document.getElementById('dd-'+t+'-btn').classList.remove('active');}});document.getElementById('dd-'+type+'-menu').classList.toggle('open');document.getElementById('dd-'+type+'-btn').classList.toggle('active');}
+function toggleDDItem(type,id){const h=type==='dept'?hiddenDepts:type==='proj'?hiddenProjects:hiddenLocs;if(h.has(id))h.delete(id);else h.add(id);updateDDLabel(type);renderChart();}
+function toggleCountryGroup(country){const g=countryGroups.find(x=>x.country===country);if(!g)return;const any=g.locIds.some(id=>!hiddenLocs.has(id));if(any)g.locIds.forEach(id=>hiddenLocs.add(id));else g.locIds.forEach(id=>hiddenLocs.delete(id));updateDDLabel('loc');renderChart();}
+function ddSelectAll(type){const h=type==='dept'?hiddenDepts:type==='proj'?hiddenProjects:hiddenLocs;h.clear();updateDDLabel(type);renderChart();}
+function ddSelectNone(type){const all=type==='dept'?allDepts:type==='proj'?allProjects:allLocs;const h=type==='dept'?hiddenDepts:type==='proj'?hiddenProjects:hiddenLocs;all.forEach(d=>h.add(d.id));updateDDLabel(type);renderChart();}
+function updateDDLabel(type){const all=type==='dept'?allDepts:type==='proj'?allProjects:allLocs;const hidden=type==='dept'?hiddenDepts:type==='proj'?hiddenProjects:hiddenLocs;const labels={dept:'Departments',proj:'Projects',loc:'Locations'};all.forEach(d=>{const el=document.getElementById('ddi-'+type+'-'+d.id);if(el)el.classList.toggle('checked',!hidden.has(d.id));});if(type==='loc'){countryGroups.forEach(g=>{const el=document.getElementById('ddi-country-'+cssSafe(g.country));if(!el)return;const shown=g.locIds.filter(id=>!hiddenLocs.has(id)).length;el.classList.remove('checked','indeterminate');if(shown===g.locIds.length)el.classList.add('checked');else if(shown>0)el.classList.add('indeterminate');});}const lab=document.getElementById('dd-'+type+'-label'),btn=document.getElementById('dd-'+type+'-btn');if(hidden.size===0){lab.textContent=labels[type];btn.classList.remove('active');}else{lab.textContent=`${all.length-hidden.size}/${all.length} ${labels[type].toLowerCase()}`;btn.classList.add('active');}}
+document.addEventListener('click',e=>{['dept','proj','loc'].forEach(t=>{const w=document.getElementById('dd-'+t+'-wrap');if(w&&!w.contains(e.target)){document.getElementById('dd-'+t+'-menu').classList.remove('open');document.getElementById('dd-'+t+'-btn').classList.remove('active');}});});
+
+function getDepth(id,d=0){const n=allNodes.find(x=>x.id===id);if(!n||!n.pid)return d;return getDepth(n.pid,d+1);}
+function nodeMatchesLocFilter(n){if(hiddenLocs.size===0)return true;if(!n.location_id)return true;return!hiddenLocs.has(n.location_id);}
+
+// ── Chart rendering ───────────────────────────────────────────────────────────
+function renderChart(filterQ){
+  const chart=document.getElementById('chart');chart.innerHTML='';
+  if(allNodes.length===0){const ed=['editor','admin','developer','superadmin'].includes(currentRole);chart.innerHTML=`<div class="empty-chart"><strong>The org chart is empty</strong>${ed?'Open <a href="/admin.html">⚙ Manage</a> to add departments, employees and projects.':'Ask an editor to add data.'}</div>`;return;}
+
+  // Track which nodes are direct search matches vs their reporting-chain ancestors
+  searchDirectMatches=new Set();searchAncestorChain=new Set();searchMatchedProjects=new Set();
+
+  // Determine if a location highlight filter is active
+  const locFilterActive=hiddenLocs.size>0;
+
+  let visible=allNodes.filter(n=>{
+    if(n.is_virtual)return true;
+    if(hiddenDepts.size>0&&n.dept_id&&hiddenDepts.has(n.dept_id))return false;
+    if(hiddenProjects.size>0&&n.projects&&n.projects.length>0&&!n.projects.some(p=>!hiddenProjects.has(p.project_id)))return false;
+    return true;
+  });
+
+  // Location filter — works like search: matching employees full color, ancestors faded, rest hidden
+  if(locFilterActive){
+    const locMatches=new Set();
+    visible.forEach(n=>{
+      if(n.is_virtual)return;
+      if(n.location_id&&!hiddenLocs.has(n.location_id)) locMatches.add(n.id);
+    });
+    // Walk up from each match to root via manager chain
+    const locChain=new Set(locMatches);
+    locMatches.forEach(id=>{
+      let n=allNodes.find(x=>x.id===id);
+      // Track matched projects so the project subtree renders for these employees
+      if(n&&primaryProjectByEmp[n.id]) searchMatchedProjects.add(primaryProjectByEmp[n.id]);
+      while(n&&n.pid){locChain.add(n.pid);searchAncestorChain.add(n.pid);n=allNodes.find(x=>x.id===n.pid);}
+    });
+    locMatches.forEach(id=>searchDirectMatches.add(id));
+    visible=visible.filter(n=>n.is_virtual||locChain.has(n.id));
+  }
+
+  if(filterQ){
+    const lq=filterQ.toLowerCase();
+    // Direct matches: employees whose name matches the search query
+    visible.filter(n=>n.name.toLowerCase().includes(lq)).forEach(n=>searchDirectMatches.add(n.id));
+    // Walk up from each match to root, collecting ancestors via pid chain
+    const allInChain=new Set(searchDirectMatches);
+    searchDirectMatches.forEach(id=>{
+      let n=allNodes.find(x=>x.id===id);
+      // If this employee is routed under a project, track it so the project tile stays visible
+      if(n&&primaryProjectByEmp[n.id]) searchMatchedProjects.add(primaryProjectByEmp[n.id]);
+      // Walk up the manager chain
+      while(n&&n.pid){allInChain.add(n.pid);searchAncestorChain.add(n.pid);n=allNodes.find(x=>x.id===n.pid);}
+    });
+    visible=allNodes.filter(n=>allInChain.has(n.id));
+  }
+
+  // Roots — nodes with no manager (or is_virtual with no pid)
+  const roots=visible.filter(n=>(n.pid||null)===null);
+
+  if(roots.length===0){chart.innerHTML=`<div class="empty-chart"><strong>Nothing matches your filters.</strong></div>`;return;}
+
+  // If there's a virtual leadership node, render it as the root
+  const virtualRoot=roots.find(n=>n.is_virtual);
+  if(virtualRoot){
+    chart.appendChild(buildVirtualSubtree(virtualRoot,visible,filterQ));
+  } else if(roots.length===1){
+    chart.appendChild(buildPersonSubtree(roots[0],visible,filterQ));
+  } else {
+    // Multiple roots — render side by side
+    const row=document.createElement('div');row.className=rowClass(roots.length);
+    roots.forEach(r=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(r,visible,filterQ));row.appendChild(col);});
+    chart.appendChild(row);
+  }
+}
+
+// ── Virtual (Leadership) node ─────────────────────────────────────────────────
+function buildVirtualSubtree(node,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree';
+  const card=document.createElement('div');card.className='virtual-node';
+  const directChildren=visible.filter(n=>(n.pid||null)===node.id);
+  card.innerHTML=`<div class="virtual-node-inner"><div class="virtual-node-icon">⭐</div><div><div class="virtual-node-name">${escapeHtml(node.title||node.name)}</div><div class="virtual-node-sub">${directChildren.length} member${directChildren.length!==1?'s':''}</div></div></div>`;
+  wrap.appendChild(card);
+  if(directChildren.length>0){
+    const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+    const cw=document.createElement('div');cw.className='subtree-children';
+    const row=document.createElement('div');row.className=rowClass(directChildren.length);
+    directChildren.forEach(c=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(c,visible,filterQ));row.appendChild(col);});
+    cw.appendChild(row);wrap.appendChild(cw);
+  }
+  return wrap;
+}
+
+// ── Person subtree (with head model + division grouping + collapsed view) ────
+//
+// Rendering rules (based on user's spec):
+//  - In COLLAPSED view: render only down to the next dept-head/dept-tile or
+//    project-head/project-tile, never deeper.
+//  - In EXPANDED view: render the full hierarchy.
+//  - For each direct report: if that report is the head of a department,
+//    they are rendered AS that department (no separate dept tile).
+//  - For depts with no head: render a department tile as a sibling.
+//  - Operations is special — it's always shown as the gateway tile under the CEO.
+//  - Inside Operations: each project either renders as the head's person card
+//    (when the project has a head) or as the project tile (no head).
+//  - Project employees: cards get a double-outline style.
+//  - Division grouping: when a person has children belonging to multiple
+//    divisions, the children render in clusters by division.
+//
+function buildPersonSubtree(node,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree';
+  wrap.appendChild(buildEmployeeCard(node));
+
+  if(treeCollapsed){
+    // In collapsed mode, ONLY the root person renders down to dept heads / Operations.
+    // Other people are rendered as leaf cards (no children below).
+    if(node.pid||node.is_virtual) return wrap;
+    return appendRootCollapsedChildren(wrap,node,visible,filterQ);
+  }
+
+  // ── Expanded mode ──
+  // Direct reports who are NOT routed under their own primary project
+  // UNLESS this node is itself a project member — then children in the same project stay here
+  // Also exclude the Operations head (they'll show under the ops subtree gateway)
+  const opsHeadId=opsDeptId?deptHeadByDept[opsDeptId]:null;
+  const nodeProject=primaryProjectByEmp[node.id]||null;
+  const directReports=visible.filter(c=>{
+    if((c.pid||null)!==node.id||c.is_virtual) return false;
+    if(opsHeadId&&c.id===opsHeadId) return false;
+    const childProject=primaryProjectByEmp[c.id];
+    if(childProject){
+      // Keep if parent is in the same project (they're part of the project hierarchy)
+      if(nodeProject&&childProject===nodeProject) return true;
+      // Otherwise filter out — they'll render under their project subtree
+      return false;
+    }
+    return true;
+  });
+
+  // Operations gateway: show when no search, or when a project employee matched the search
+  const opsProjects=opsDeptId?allProjects.filter(p=>(hiddenProjects.size===0||!hiddenProjects.has(p.id))):[];
+  const showOpsUnderThisNode=!node.pid&&!node.is_virtual&&opsProjects.length>0&&(searchDirectMatches.size===0||searchMatchedProjects.size>0);
+
+  // Department tiles for departments WITHOUT a head, whose members include any
+  // of this person's direct reports. (When a dept has a head, the head's card
+  // already represents the dept — no separate tile.)
+  const headlessDeptTiles=[];
+  const headlessDeptIds=new Set();
+  if(!node.pid&&!node.is_virtual&&searchDirectMatches.size===0){
+    // Only the CEO/root sees dept tiles for headless depts (the dept-tile-as-fallback rule)
+    const seenDepts=new Set();
+    directReports.forEach(c=>{
+      if(!c.dept_id||c.dept_id===opsDeptId) return;
+      if(seenDepts.has(c.dept_id)) return;
+      seenDepts.add(c.dept_id);
+      // Only show tile if dept has NO head (heads are rendered as themselves)
+      if(deptHeadByDept[c.dept_id]) return;
+      const count=allNodes.filter(n=>n.dept_id===c.dept_id).length;
+      headlessDeptTiles.push({deptId:c.dept_id,name:c.dept,color:c.dept_color,count});
+      headlessDeptIds.add(c.dept_id);
+    });
+  }
+  // Filter out direct reports that belong to headless depts — they render under the Vacant card
+  const filteredReports=headlessDeptIds.size>0?directReports.filter(c=>!c.dept_id||!headlessDeptIds.has(c.dept_id)):directReports;
+
+  const isCollTree=collapsedTree.has(node.id);
+  const totalChildren=filteredReports.length+headlessDeptTiles.length+(showOpsUnderThisNode?1:0);
+  const hasChildren=totalChildren>0;
+
+  if(hasChildren&&!isCollTree){
+    const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+    const cw=document.createElement('div');cw.className='subtree-children';
+
+    // The layoutMode (Auto/Horizontal/Vertical) toggle applies to the row of
+    // direct reports under a department head (excluding Operations), under a
+    // project head, or under any node within a project hierarchy.
+    const isNonOpsDeptHead = (node.dept_id && node.dept_id!==opsDeptId && deptHeadByDept[node.dept_id]===node.id)
+      || (primaryProjectByEmp[node.id]); // project members also respect layout
+
+    // Determine if children should be grouped by division
+    // (only kicks in when this person has direct reports spanning multiple divisions)
+    const grouped=groupChildrenByDivision(filteredReports);
+
+    if(grouped&&grouped.groups.length>1){
+      // Division-grouped layout: render each division group as a labeled cluster,
+      // headless dept tiles + Operations appended at the end.
+      const total=grouped.groups.length+headlessDeptTiles.length+(showOpsUnderThisNode?1:0);
+      const row=document.createElement('div');row.className=rowClass(total,isNonOpsDeptHead);
+      grouped.groups.forEach(g=>{
+        const col=document.createElement('div');col.className='child-col';
+        col.appendChild(buildDivisionGroup(g,visible,filterQ));
+        row.appendChild(col);
+      });
+      headlessDeptTiles.forEach(t=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildDeptSubtree(t,visible,filterQ));row.appendChild(col);});
+      if(showOpsUnderThisNode){const col=document.createElement('div');col.className='child-col';col.appendChild(buildOpsSubtree(opsProjects,visible,filterQ));row.appendChild(col);}
+      cw.appendChild(row);wrap.appendChild(cw);
+    } else {
+      // Flat layout: all reports + headless dept tiles + Operations
+      const row=document.createElement('div');row.className=rowClass(totalChildren,isNonOpsDeptHead);
+      filteredReports.forEach(emp=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(emp,visible,filterQ));row.appendChild(col);});
+      headlessDeptTiles.forEach(t=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildDeptSubtree(t,visible,filterQ));row.appendChild(col);});
+      if(showOpsUnderThisNode){const col=document.createElement('div');col.className='child-col';col.appendChild(buildOpsSubtree(opsProjects,visible,filterQ));row.appendChild(col);}
+      cw.appendChild(row);wrap.appendChild(cw);
+    }
+  }
+
+  const tt=wrap.querySelector('.card-tree-toggle');
+  if(tt&&!hasChildren) tt.style.display='none';
+  return wrap;
+}
+
+// Append the collapsed-mode children of the root person:
+//  - Each department: head (as their card, recursing not allowed) OR dept tile
+//  - Operations tile (always when present), with project heads/tiles below
+function appendRootCollapsedChildren(wrap,node,visible,filterQ){
+  // Departments with members (excluding Operations)
+  const deptCols=[];
+  const seenDepts=new Set();
+  allNodes.forEach(n=>{
+    if(!n.dept_id||n.dept_id===opsDeptId||seenDepts.has(n.dept_id)) return;
+    if(hiddenDepts.size>0&&hiddenDepts.has(n.dept_id)) return;
+    seenDepts.add(n.dept_id);
+    const headId=deptHeadByDept[n.dept_id];
+    if(headId){
+      const headNode=allNodes.find(x=>x.id===headId);
+      if(headNode){
+        const col=document.createElement('div');col.className='child-col';
+        // Render the head as a leaf card (no children even though they have reports)
+        const sub=document.createElement('div');sub.className='subtree';sub.appendChild(buildEmployeeCard(headNode));
+        col.appendChild(sub);
+        deptCols.push(col);
+      }
+    } else {
+      const count=allNodes.filter(x=>x.dept_id===n.dept_id).length;
+      const col=document.createElement('div');col.className='child-col';
+      col.appendChild(buildDeptSubtree({deptId:n.dept_id,name:n.dept,color:n.dept_color,count},visible,filterQ));
+      deptCols.push(col);
+    }
+  });
+
+  // Operations + projects — show during search only if a project employee matched
+  const allOpsProjects=(opsDeptId)?allProjects.filter(p=>(hiddenProjects.size===0||!hiddenProjects.has(p.id))):[];
+  const opsProjects=(searchDirectMatches.size>0&&searchMatchedProjects.size===0)?[]:allOpsProjects;
+  let opsCol=null;
+  if(opsProjects.length>0){
+    opsCol=document.createElement('div');opsCol.className='child-col';
+    opsCol.appendChild(buildOpsSubtreeCollapsed(opsProjects,visible,filterQ));
+  }
+
+  const total=deptCols.length+(opsCol?1:0);
+  if(total===0) return wrap;
+  const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+  const cw=document.createElement('div');cw.className='subtree-children';
+  // Top-level CEO row (depts + Operations) is always horizontal
+  const row=document.createElement('div');row.className=rowClass(total);
+  deptCols.forEach(c=>row.appendChild(c));
+  if(opsCol) row.appendChild(opsCol);
+  cw.appendChild(row);wrap.appendChild(cw);
+  return wrap;
+}
+
+// Operations tile in collapsed mode — projects below are heads or tiles only.
+function buildOpsSubtreeCollapsed(projects,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree';
+  const opsHead=opsDeptId?deptHeadByDept[opsDeptId]:null;
+  const opsHeadNode=opsHead?allNodes.find(n=>n.id===opsHead):null;
+  if(opsHeadNode){
+    wrap.appendChild(buildEmployeeCard(opsHeadNode));
+  } else {
+    wrap.appendChild(buildVacantCard({title:'Operations Head',dept:'Operations',deptId:opsDeptId,color:'#0f766e',treeKey:'ops',hasChildren:projects.length>0}));
+  }
+  if(projects.length===0) return wrap;
+  const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+  const cw=document.createElement('div');cw.className='subtree-children';
+  // Operations → projects row stays horizontal (structural)
+  const row=document.createElement('div');row.className=rowClass(projects.length);
+  projects.forEach(p=>{
+    const col=document.createElement('div');col.className='child-col';
+    const headId=projectHeadByProject[p.id];
+    if(headId){
+      const headNode=allNodes.find(x=>x.id===headId);
+      if(headNode){
+        const sub=document.createElement('div');sub.className='subtree';sub.appendChild(buildEmployeeCard(headNode));
+        col.appendChild(sub);
+      } else {
+        const sub=document.createElement('div');sub.className='subtree';sub.appendChild(buildProjectTile(p));col.appendChild(sub);
+      }
+    } else {
+      const sub=document.createElement('div');sub.className='subtree';sub.appendChild(buildProjectTile(p));col.appendChild(sub);
+    }
+    row.appendChild(col);
+  });
+  cw.appendChild(row);wrap.appendChild(cw);
+  return wrap;
+}
+
+// Group a list of direct reports by their primary division.
+// Returns null if there's no division split (all in one or none have divisions).
+// Returns {groups:[{division, employees:[...]}, ...]} if 2+ divisions are represented.
+function groupChildrenByDivision(reports){
+  if(reports.length<2) return null;
+  const buckets=new Map(); // key -> {division, employees}
+  let withoutDiv=0;
+  reports.forEach(r=>{
+    const divs=r.divisions||[];
+    if(divs.length===0){withoutDiv++; return;}
+    const primary=divs[0]; // primary = first listed
+    const k=primary.division_id;
+    if(!buckets.has(k)) buckets.set(k,{division:primary,employees:[]});
+    buckets.get(k).employees.push(r);
+  });
+  if(buckets.size<=1) return null; // no real grouping
+  const groups=[...buckets.values()].sort((a,b)=>a.division.division_name.localeCompare(b.division.division_name));
+  // Add the "no division" group at the end if there are uncategorized reports
+  if(withoutDiv>0){
+    groups.push({division:{division_id:null,division_name:'Other',division_color:'#94a3b8'},employees:reports.filter(r=>!r.divisions||r.divisions.length===0)});
+  }
+  return {groups};
+}
+
+// Render a division group: a small label header + the employees clustered.
+function buildDivisionGroup(group,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree division-group';
+  const color=group.division.division_color||'#6366f1';
+  const head=document.createElement('div');head.className='division-group-head';
+  head.style.borderColor=color;head.style.color=color;
+  head.innerHTML=`<span class="division-group-dot" style="background:${color}"></span>${escapeHtml(group.division.division_name)}<span class="division-group-count">${group.employees.length}</span>`;
+  wrap.appendChild(head);
+  const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+  const cw=document.createElement('div');cw.className='subtree-children';
+  const row=document.createElement('div');row.className=rowClass(group.employees.length);
+  group.employees.forEach(emp=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(emp,visible,filterQ));row.appendChild(col);});
+  cw.appendChild(row);wrap.appendChild(cw);
+  return wrap;
+}
+
+// ── Vacant card (shown when a dept or project has no head appointed) ──────────
+// Matches buildEmployeeCard exactly: same .node-card structure, same expand
+// toggle, same tree toggle (show/hide reports). Avatar is a solid block of the
+// department colour. Name reads "Vacant"; title shows the expected position.
+function buildVacantCard(opts){
+  // opts: {title, dept, deptId, color, treeKey, hasChildren, faded, projectChip}
+  const color=opts.color||'#2563eb';
+  const treeKey=opts.treeKey||null; // e.g. 'ops' or 'proj:5' for collapsedTree
+  const isExpanded=false; // vacant cards are never expanded (no contact detail)
+  const hasKids=!!opts.hasChildren;
+  const showTreeToggle=hasKids&&!treeCollapsed;
+
+  const card=document.createElement('div');
+  // Apply fading logic identical to buildEmployeeCard
+  let extraClasses='';
+  if(opts.faded) extraClasses+=' faded';
+  if(panelFadeDeptId&&opts.deptId&&opts.deptId!==panelFadeDeptId) extraClasses+=' faded';
+  if(panelFadeProjectId){
+    // Vacant cards are never "on" a project unless they have a projectChip
+    if(opts.projectChip){
+      if(opts.projectChip.id!==panelFadeProjectId) extraClasses+=' faded';
+    } else {
+      extraClasses+=' faded';
+    }
+  }
+  if(searchDirectMatches.size>0&&!opts.faded) extraClasses+=' faded';
+  card.className='node-card'+extraClasses;
+
+  // Solid-colour avatar with no text (just the dept colour fill)
+  const av=`https://ui-avatars.com/api/?name=+&background=${color.replace('#','')}&color=${color.replace('#','')}&size=256`;
+
+  let deptBadge='';
+  if(opts.dept&&opts.deptId){
+    deptBadge=`<button class="card-dept" style="background:${color}18;color:${color}" data-dept-id="${opts.deptId}" data-color="${color}">${escapeHtml(opts.dept)}</button>`;
+  }
+
+  let projChipHtml='';
+  if(opts.projectChip){
+    projChipHtml=`<div class="proj-chips"><span class="proj-chip primary" style="background:${color}" data-proj-id="${opts.projectChip.id}">◆ ${escapeHtml(opts.projectChip.name)}</span></div>`;
+  }
+
+  card.innerHTML=`
+    <div class="card-stripe" style="background:${color}"></div>
+    <div class="card-header">
+      <img class="card-avatar" src="${av}" alt="Vacant"/>
+      <div class="card-text">
+        <div class="card-title">${escapeHtml(opts.title||'')}</div>
+        ${deptBadge}
+        <div class="card-name" style="color:#9ca3af;font-style:italic">Vacant</div>
+        ${projChipHtml}
+      </div>
+    </div>
+    <div class="card-detail"><div class="card-detail-inner">
+      <div class="d-label">Status</div>
+      <div class="d-row" style="color:#9ca3af">This position is currently unassigned.</div>
+    </div></div>
+    <div class="card-expand-toggle"><i class="arrow">▼</i><span>expand profile</span></div>
+    ${showTreeToggle&&treeKey?`<div class="card-tree-toggle">${collapsedTree.has(treeKey)?'＋ show reports':'－ hide reports'}</div>`:''}
+  `;
+
+  // Expand toggle (shows the "This position is unassigned" detail)
+  const vacantExpandKey='vacant:'+(opts.treeKey||opts.deptId||'');
+  card.querySelector('.card-header').addEventListener('click',(e)=>{
+    if(e.target.closest('.card-dept')||e.target.closest('.proj-chip'))return;
+    card.classList.toggle('expanded');
+    const sp=card.querySelector('.card-expand-toggle span');
+    if(sp) sp.textContent=card.classList.contains('expanded')?'collapse profile':'expand profile';
+  });
+  card.querySelector('.card-expand-toggle').addEventListener('click',()=>{
+    card.classList.toggle('expanded');
+    const sp=card.querySelector('.card-expand-toggle span');
+    if(sp) sp.textContent=card.classList.contains('expanded')?'collapse profile':'expand profile';
+  });
+
+  // Dept badge click
+  card.querySelectorAll('.card-dept').forEach(db=>{
+    db.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(db.dataset.deptId) openDeptPanelById(parseInt(db.dataset.deptId),db.dataset.color);
+    });
+  });
+
+  // Project chip click
+  card.querySelectorAll('.proj-chip').forEach(c=>c.addEventListener('click',(e)=>{e.stopPropagation();if(c.dataset.projId)openProjectPanel(parseInt(c.dataset.projId));}));
+
+  // Tree toggle
+  if(showTreeToggle&&treeKey){
+    const tt=card.querySelector('.card-tree-toggle');
+    if(tt) tt.addEventListener('click',(e)=>{e.stopPropagation();toggleTree(treeKey);});
+  }
+
+  return card;
+}
+
+// ── Department subtree (shown when the dept has no head) ─────────────────────
+// Renders a "Vacant" card with the department's members grouped beneath it,
+// just like Operations does with projects. Supports expand/collapse.
+function buildDeptSubtree(group,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree';
+  const color=group.color||'#2563eb';
+  const deptNameLower=(group.name||'').toLowerCase();
+  let posTitle;
+  if(deptNameLower==='operations') posTitle='Operations Head';
+  else if(deptNameLower==='human resources'||deptNameLower==='hr') posTitle='HR Head';
+  else if(deptNameLower==='learning & development'||deptNameLower==='l&d') posTitle='L&D Head';
+  else posTitle=group.name+' Head';
+
+  // Find department members who are in the visible set and whose manager is the
+  // root node (CEO) or who have no manager — these are "top-level" dept members.
+  // We show them as children of the vacant card.
+  const deptMembers=visible.filter(n=>n.dept_id===group.deptId&&!n.is_virtual);
+  // Top-level members: those whose manager is NOT another dept member (or is the root/CEO)
+  const deptMemberIds=new Set(deptMembers.map(n=>n.id));
+  const topLevel=deptMembers.filter(n=>!n.pid||!deptMemberIds.has(n.pid));
+
+  const treeKey='dept:'+group.deptId;
+  const card=buildVacantCard({title:posTitle,dept:group.name,deptId:group.deptId,color,treeKey,hasChildren:topLevel.length>0});
+  wrap.appendChild(card);
+
+  const isCollTree=collapsedTree.has(treeKey);
+  if(topLevel.length>0&&!isCollTree){
+    const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+    const cw=document.createElement('div');cw.className='subtree-children';
+    const isNonOpsDeptHead=true; // respect layoutMode for dept children
+    const grouped=groupChildrenByDivision(topLevel);
+    if(grouped&&grouped.groups.length>1){
+      const row=document.createElement('div');row.className=rowClass(grouped.groups.length,isNonOpsDeptHead);
+      grouped.groups.forEach(g=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildDivisionGroup(g,visible,filterQ));row.appendChild(col);});
+      cw.appendChild(row);
+    } else {
+      const row=document.createElement('div');row.className=rowClass(topLevel.length,isNonOpsDeptHead);
+      topLevel.forEach(emp=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(emp,visible,filterQ));row.appendChild(col);});
+      cw.appendChild(row);
+    }
+    wrap.appendChild(cw);
+  }
+  return wrap;
+}
+
+// ── Operations gateway (expanded mode) — projects route through this tile ────
+// Operations now renders as a "Vacant Operations Head" card (same visual as
+// other department head cards) when no head is appointed.
+function buildOpsSubtree(projects,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree';
+  const visibleProjects=searchMatchedProjects.size>0?projects.filter(p=>searchMatchedProjects.has(p.id)):projects;
+
+  const opsHead=opsDeptId?deptHeadByDept[opsDeptId]:null;
+  const opsHeadNode=opsHead?allNodes.find(n=>n.id===opsHead):null;
+
+  let topCard;
+  if(opsHeadNode){
+    topCard=buildEmployeeCard(opsHeadNode);
+  } else {
+    const isFaded=searchDirectMatches.size>0;
+    topCard=buildVacantCard({title:'Operations Head',dept:'Operations',deptId:opsDeptId,color:'#0f766e',treeKey:'ops',hasChildren:visibleProjects.length>0,faded:isFaded});
+  }
+  wrap.appendChild(topCard);
+
+  const isCollTree=collapsedTree.has('ops');
+  if(visibleProjects.length>0&&!isCollTree){
+    const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+    const cw=document.createElement('div');cw.className='subtree-children';
+    const row=document.createElement('div');row.className=rowClass(visibleProjects.length);
+    visibleProjects.forEach(p=>{
+      const col=document.createElement('div');col.className='child-col';
+      col.appendChild(buildProjectSubtree(p,visible,filterQ));
+      row.appendChild(col);
+    });
+    cw.appendChild(row);wrap.appendChild(cw);
+  }
+  return wrap;
+}
+
+// Plain project tile (used when project has no head) — now renders as a
+// "Vacant" card with a "Project Manager" title so it matches the employee-card style.
+function buildProjectTile(project){
+  const color=project.color||'#0f766e';
+  const isFaded=searchDirectMatches.size>0&&!(projectChildrenByProj[project.id]||[]).some(eid=>searchDirectMatches.has(eid));
+  const projEmps=projectChildrenByProj[project.id]||[];
+  const card=buildVacantCard({title:project.name+' Head',dept:null,deptId:null,color,treeKey:'proj:'+project.id,hasChildren:projEmps.length>0,faded:isFaded,projectChip:{id:project.id,name:project.name}});
+  return card;
+}
+
+// ── Project subtree (expanded mode) ──────────────────────────────────────────
+// If project has a head: render the head's card + their team beneath them.
+// If project has no head: render the project tile + members directly.
+// In either case, project members get the double-outline visual style.
+function buildProjectSubtree(project,visible,filterQ){
+  const wrap=document.createElement('div');wrap.className='subtree';
+  const headId=projectHeadByProject[project.id];
+  const headNode=headId?allNodes.find(n=>n.id===headId):null;
+
+  const allProjEmpIds=projectChildrenByProj[project.id]||[];
+  const projEmps=allProjEmpIds.map(id=>allNodes.find(n=>n.id===id)).filter(Boolean).filter(e=>visible.find(n=>n.id===e.id)&&nodeMatchesLocFilter(e));
+  const isCollTree=collapsedTree.has('proj:'+project.id);
+
+  if(headNode){
+    // Head replaces the tile; render head's card and recurse into THEIR direct reports
+    wrap.appendChild(buildEmployeeCard(headNode));
+    if(isCollTree) return wrap;
+
+    // Direct reports of the head who are also project members
+    const directReports=projEmps.filter(e=>e.id!==headNode.id&&(e.pid||null)===headNode.id);
+    if(directReports.length===0) return wrap;
+
+    const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+    const cw=document.createElement('div');cw.className='subtree-children';
+    // Row directly under a project head respects the layoutMode toggle
+    const grouped=groupChildrenByDivision(directReports);
+    if(grouped&&grouped.groups.length>1){
+      const row=document.createElement('div');row.className=rowClass(grouped.groups.length,true);
+      grouped.groups.forEach(g=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildDivisionGroup(g,visible,filterQ));row.appendChild(col);});
+      cw.appendChild(row);
+    } else {
+      const row=document.createElement('div');row.className=rowClass(directReports.length,true);
+      directReports.forEach(emp=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(emp,visible,filterQ));row.appendChild(col);});
+      cw.appendChild(row);
+    }
+    wrap.appendChild(cw);
+    return wrap;
+  }
+
+  // No head — render the project tile
+  wrap.appendChild(buildProjectTile(project));
+  if(isCollTree||projEmps.length===0) return wrap;
+
+  // Top-level project members (those whose manager isn't another project member)
+  const projEmpIds=new Set(projEmps.map(e=>e.id));
+  const topLevel=projEmps.filter(e=>!e.pid||!projEmpIds.has(e.pid));
+  if(topLevel.length===0) return wrap;
+
+  const conn=document.createElement('div');conn.className='connector-down';wrap.appendChild(conn);
+  const cw=document.createElement('div');cw.className='subtree-children';
+  // Row directly under a project tile (no head) respects the layoutMode toggle
+  const grouped=groupChildrenByDivision(topLevel);
+  if(grouped&&grouped.groups.length>1){
+    const row=document.createElement('div');row.className=rowClass(grouped.groups.length,true);
+    grouped.groups.forEach(g=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildDivisionGroup(g,visible,filterQ));row.appendChild(col);});
+    cw.appendChild(row);
+  } else {
+    const row=document.createElement('div');row.className=rowClass(topLevel.length,true);
+    topLevel.forEach(emp=>{const col=document.createElement('div');col.className='child-col';col.appendChild(buildPersonSubtree(emp,visible,filterQ));row.appendChild(col);});
+    cw.appendChild(row);
+  }
+  wrap.appendChild(cw);
+  return wrap;
+}
+
+// ── Employee card ─────────────────────────────────────────────────────────────
+function buildEmployeeCard(node){
+  const color=node.dept_color||'#1d4ed8';const isExpanded=expandedCards.has(node.id);
+
+  // Apply CSS classes for visual states:
+  //  - .project-employee: double-outline style (employees whose primary position is project-based)
+  //  - .faded: when a dept/project panel is open and this person isn't a member,
+  //            OR when searching and this person is an ancestor in the reporting chain (not a direct match)
+  let extraClasses='';
+  if(node.is_project_employee||primaryProjectByEmp[node.id]) extraClasses+=' project-employee';
+  if(panelFadeDeptId&&node.dept_id!==panelFadeDeptId) extraClasses+=' faded';
+  if(panelFadeProjectId){
+    const onProj=(node.projects||[]).some(p=>p.project_id===panelFadeProjectId);
+    if(!onProj) extraClasses+=' faded';
+  }
+  // Search: ancestor-chain nodes are faded, direct matches are full color
+  if(searchDirectMatches.size>0&&!searchDirectMatches.has(node.id)&&searchAncestorChain.has(node.id)) extraClasses+=' faded';
+
+  const card=document.createElement('div');card.className='node-card'+(isExpanded?' expanded':'')+extraClasses;card.dataset.id=node.id;
+  const av=`https://ui-avatars.com/api/?name=${encodeURIComponent(node.name)}&background=${color.replace('#','')}&color=fff&size=256&bold=true&font-size=0.4`;
+  const hire=node.hire_date?(()=>{const d=new Date(node.hire_date),y=Math.floor((Date.now()-d)/(365.25*24*3600*1000));return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+` · ${y} yr`;})():null;
+  const emails=Array.isArray(node.emails)?node.emails:[];const primary=emails.find(e=>e.is_primary)||emails[0]||null;const others=emails.filter(e=>e!==primary);
+
+  // Build the dept badge. If person is head of a dept, show "Head of X" prefix.
+  let dept='';
+  if(node.dept&&node.dept_id){
+    const headOf=node.head_of_dept_id===node.dept_id?'Head of ':'';
+    dept=`<button class="card-dept" style="background:${color}18;color:${color}" data-dept-id="${node.dept_id}" data-color="${color}">${headOf}${escapeHtml(node.dept)}</button>`;
+  }
+  // If person is head of a project (and the position points to a project), show that too
+  if(node.head_of_project_id){
+    const proj=allProjects.find(p=>p.id===node.head_of_project_id);
+    if(proj){
+      const pcolor=proj.color||'#0f766e';
+      dept+=`<button class="card-dept" style="background:${pcolor}18;color:${pcolor};margin-left:.3rem" data-proj-id="${proj.id}">Head of ${escapeHtml(proj.name)}</button>`;
+    }
+  }
+
+  // Division names go on a single line directly under the dept badge
+  const divLine=(node.divisions||[]).length>0
+    ? `<div class="card-div-line">${(node.divisions||[]).map(d=>`<span class="div-name" style="color:${d.division_color||'#6366f1'}">${escapeHtml(d.division_name)}</span>`).join('<span class="div-sep">·</span>')}</div>`
+    : '';
+
+  const projChips=(node.projects||[]).map(p=>`<span class="proj-chip${p.is_primary?' primary':''}" data-proj-id="${p.project_id}">◆ ${escapeHtml(p.project_name)}</span>`).join('');
+
+  // Check for children (for tree toggle)
+  const hasDirectKids=allNodes.some(c=>(c.pid||null)===node.id&&!c.is_virtual&&!primaryProjectByEmp[c.id]);
+  const showTreeToggle=hasDirectKids&&!treeCollapsed;
+
+  card.innerHTML=`
+    <div class="card-stripe" style="background:${color}"></div>
+    <div class="card-header">
+      <img class="card-avatar" src="${av}" alt="${escapeHtml(node.name)}"/>
+      <div class="card-text">
+        <div class="card-title">${escapeHtml(node.title||'—')}</div>
+        ${dept}
+        ${divLine}
+        <div class="card-name">${escapeHtml(node.name)}</div>
+        ${node.location_name?`<div class="loc-tag">📍 ${escapeHtml(node.location_name)}</div>`:''}
+        ${projChips?`<div class="proj-chips">${projChips}</div>`:''}
+      </div>
+    </div>
+    <div class="card-detail"><div class="card-detail-inner">
+      ${(primary||node.phone||node.location_name||hire)?`<div class="d-label">Contact & Info</div>
+        ${primary?`<div class="d-row"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${primary.email}">${escapeHtml(primary.email)}</a>${primary.label?`<span class="email-label">${escapeHtml(primary.label)}</span>`:''}</div>`:''}
+        ${others.map(e=>`<div class="email-extra"><a href="mailto:${e.email}">${escapeHtml(e.email)}</a>${e.label?`<span class="email-label">${escapeHtml(e.label)}</span>`:''}</div>`).join('')}
+        ${node.phone?`<div class="d-row">📞 ${escapeHtml(node.phone)}</div>`:''}
+        ${node.location_name?`<div class="d-row">📍 ${escapeHtml(node.location_name)}${node.location_country?', '+escapeHtml(node.location_country):''}</div>`:''}
+        ${hire?`<div class="d-row">📅 ${hire}</div>`:''}
+      `:''}
+      ${node.bio?`<div class="d-label">About</div><div class="d-bio">${escapeHtml(node.bio)}</div>`:''}
+      ${node.position_description?`<div class="d-label">Job Description</div><div class="d-bio">${escapeHtml(node.position_description)}</div>`:''}
+    </div></div>
+    <div class="card-expand-toggle"><i class="arrow">▼</i><span>${isExpanded?'collapse profile':'expand profile'}</span></div>
+    ${showTreeToggle?`<div class="card-tree-toggle">${collapsedTree.has(node.id)?'＋ show reports':'－ hide reports'}</div>`:''}
+  `;
+
+  card.querySelector('.card-header').addEventListener('click',(e)=>{if(e.target.closest('.card-dept')||e.target.closest('.proj-chip'))return;toggleCard(node.id);});
+  card.querySelector('.card-expand-toggle').addEventListener('click',()=>toggleCard(node.id));
+  card.querySelectorAll('.card-dept').forEach(db=>{
+    db.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(db.dataset.deptId) openDeptPanelById(parseInt(db.dataset.deptId),db.dataset.color);
+      else if(db.dataset.projId) openProjectPanel(parseInt(db.dataset.projId));
+    });
+  });
+  card.querySelectorAll('.proj-chip').forEach(c=>c.addEventListener('click',(e)=>{e.stopPropagation();openProjectPanel(parseInt(c.dataset.projId));}));
+  const tt=card.querySelector('.card-tree-toggle');if(tt) tt.addEventListener('click',(e)=>{e.stopPropagation();toggleTree(node.id);});
+  return card;
+}
+
+function toggleCard(id){if(expandedCards.has(id))expandedCards.delete(id);else expandedCards.add(id);renderChart(document.getElementById('search').value.trim()||undefined);}
+function toggleTree(id){if(collapsedTree.has(id))collapsedTree.delete(id);else collapsedTree.add(id);renderChart(document.getElementById('search').value.trim()||undefined);}
+
+// ── Panels ────────────────────────────────────────────────────────────────────
+async function openDeptPanelById(deptId,color){
+  closeProjectPanel();closeDetailPanel();
+  panelFadeDeptId=deptId;panelFadeProjectId=null;
+  renderChart(document.getElementById('search').value.trim()||undefined);
+  const dept=await fetch(`/api/departments/${deptId}`).then(r=>r.json());
+  document.getElementById('dp-dot').style.background=color;
+  document.getElementById('dp-name').textContent=dept.name;
+  const mc=allNodes.filter(n=>n.dept_id===deptId).length;
+  document.getElementById('dp-subtitle').textContent=`${mc} employee${mc!==1?'s':''}`;
+  let html=`<div class="p-section">`;
+  if(dept.description) html+=`<div class="p-sec-label">About</div><div class="p-desc">${escapeHtml(dept.description)}</div>`;
+  html+=`</div>`;
+  // Standards
+  if(dept.standards&&dept.standards.length){html+=`<div class="p-section"><div class="p-sec-label">Standards & Compliance</div>`;dept.standards.forEach(s=>{html+=`<div class="panel-item" onclick="openStandardDetail(${s.id},'${escapeHtml(s.scope||'').replace(/'/g,"\\'")}',${deptId})" style="flex-direction:column;align-items:flex-start;gap:.15rem;cursor:pointer"><div style="display:flex;align-items:center;gap:.35rem;width:100%"><span style="font-size:.7rem;font-weight:700;background:#dbeafe;color:#1d4ed8;padding:.1rem .4rem;border-radius:4px">${escapeHtml(s.code)}</span><span class="item-label" style="font-size:.82rem;flex:1">${escapeHtml(s.full_name)}</span><span class="item-arrow">›</span></div>${s.scope?`<div style="font-size:.75rem;color:var(--muted);margin-left:.1rem;line-height:1.4">Scope: ${escapeHtml(s.scope)}</div>`:''}</div>`;});html+=`</div>`;}
+  if(dept.name?.toLowerCase()==='operations'&&allProjects.length>0){html+=`<div class="p-section"><div class="p-sec-label">Client Projects</div>`;allProjects.forEach(p=>{html+=`<div class="panel-item" onclick="openProjectPanel(${p.id})"><div class="rel-dot" style="background:${p.color||'#0f766e'}"></div><span class="item-label">${escapeHtml(p.name)}</span><span class="item-arrow">›</span></div>`;});html+=`</div>`;}
+  if(dept.relations&&dept.relations.length){html+=`<div class="p-section"><div class="p-sec-label">Works With</div>`;dept.relations.forEach(r=>{html+=`<div class="panel-item" onclick="openRelationDetail('${encodeURIComponent(dept.name)}','${encodeURIComponent(r.other_name)}','${color}','${r.other_color}','${encodeURIComponent(r.relation||'')}','${encodeURIComponent(r.input_from_b||'')}','${encodeURIComponent(r.output_to_b||'')}')"><div class="rel-dot" style="background:${r.other_color}"></div><span class="item-label">${escapeHtml(r.other_name)}</span><span class="item-arrow">›</span></div>`;});html+=`</div>`;}
+  if(dept.positions&&dept.positions.length){html+=`<div class="p-section"><div class="p-sec-label">Positions</div>`;dept.positions.forEach(p=>{html+=`<div class="panel-item" onclick="openPositionDetail(${p.id})"><span class="item-label">${escapeHtml(p.title)}</span><span class="item-count">${p.headcount}</span><span class="item-arrow">›</span></div>`;});html+=`</div>`;}
+  const members=allNodes.filter(n=>n.dept_id===deptId);
+  if(members.length){html+=`<div class="p-section"><div class="p-sec-label">Team Members</div>`;members.forEach(m=>{const a=`https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=${color.replace('#','')}&color=fff&size=80&bold=true&font-size=0.4`;html+=`<div class="member-row" onclick="openEmployeeDetail(${m.id})" style="cursor:pointer"><img src="${a}"/><div><strong>${escapeHtml(m.title)}</strong><span>${escapeHtml(m.name)}</span></div><span class="item-arrow" style="margin-left:auto">›</span></div>`;});html+=`</div>`;}
+  document.getElementById('dp-body').innerHTML=html;
+  document.getElementById('panel-dept').classList.add('open');
+}
+function closeDeptPanel(){document.getElementById('panel-dept').classList.remove('open');closeDetailPanel();if(panelFadeDeptId){panelFadeDeptId=null;renderChart(document.getElementById('search').value.trim()||undefined);}}
+
+async function openProjectPanel(projectId){
+  closeDeptPanel();closeDetailPanel();
+  panelFadeProjectId=projectId;panelFadeDeptId=null;
+  renderChart(document.getElementById('search').value.trim()||undefined);
+  const p=await fetch(`/api/client-projects/${projectId}`).then(r=>r.json());
+  if(p.error){toast(p.error,'err');return;}
+  const color=p.color||'#0f766e';
+  document.getElementById('pp-dot').style.background=color;
+  document.getElementById('pp-name').textContent=p.name;
+  document.getElementById('pp-subtitle').innerHTML=`Operations${p.client_company?' · '+escapeHtml(p.client_company):''}`;
+  let html=`<div class="p-section">`;
+  if(p.description) html+=`<div class="p-sec-label">About</div><div class="p-desc">${escapeHtml(p.description)}</div>`;
+  if(p.languages||p.start_date||p.client_company){html+=`<div class="p-sec-label" style="margin-top:.7rem">Details</div>`;if(p.client_company) html+=`<div class="d-row"><strong style="color:#475569">Client:</strong> ${escapeHtml(p.client_company)}</div>`;if(p.languages){const langs=p.languages.split(',').map(s=>normalizeLang(s)).filter(Boolean);html+=`<div class="d-row"><strong style="color:#475569">Languages:</strong></div><div style="display:flex;flex-wrap:wrap;gap:.3rem;margin:.3rem 0 .5rem">${langs.map(l=>`<span style="display:inline-block;padding:.15rem .55rem;border-radius:100px;font-size:.72rem;font-weight:600;background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe">${escapeHtml(l)}</span>`).join('')}</div>`;}if(p.start_date) html+=`<div class="d-row"><strong style="color:#475569">Started:</strong> ${escapeHtml(p.start_date)}</div>`;}
+  html+=`</div>`;
+  // Standards
+  if(p.standards&&p.standards.length){html+=`<div class="p-section"><div class="p-sec-label">Standards & Compliance</div>`;p.standards.forEach(s=>{html+=`<div class="panel-item" onclick="openStandardDetail(${s.id},'${escapeHtml(s.scope||'').replace(/'/g,"\\'")}')" style="flex-direction:column;align-items:flex-start;gap:.15rem;cursor:pointer"><div style="display:flex;align-items:center;gap:.35rem;width:100%"><span style="font-size:.7rem;font-weight:700;background:#dbeafe;color:#1d4ed8;padding:.1rem .4rem;border-radius:4px">${escapeHtml(s.code)}</span><span class="item-label" style="font-size:.82rem;flex:1">${escapeHtml(s.full_name)}</span><span class="item-arrow">›</span></div>${s.scope?`<div style="font-size:.75rem;color:var(--muted);margin-left:.1rem;line-height:1.4">Scope: ${escapeHtml(s.scope)}</div>`:''}</div>`;});html+=`</div>`;}
+  if(p.divisions&&p.divisions.length){html+=`<div class="p-section"><div class="p-sec-label">Divisions</div>`;p.divisions.forEach(d=>{html+=`<div class="panel-item"><span style="color:${d.color||'#6366f1'}">▣</span><span class="item-label">${escapeHtml(d.name)}</span><span class="item-count">${d.member_count||0}</span></div>`;});html+=`</div>`;}
+  if(p.members&&p.members.length){html+=`<div class="p-section"><div class="p-sec-label">Team Members</div>`;p.members.forEach(m=>{const fn=`${m.first_name} ${m.last_name}`;const c=(m.dept_color||color).replace('#','');const a=`https://ui-avatars.com/api/?name=${encodeURIComponent(fn)}&background=${c}&color=fff&size=80&bold=true&font-size=0.4`;html+=`<div class="member-row" onclick="openEmployeeDetail(${m.id||m.employee_id})" style="cursor:pointer"><img src="${a}"/><div><strong>${escapeHtml(fn)}${m.is_primary?' ★':''}</strong><span>${escapeHtml(m.role_on_project||m.position_title||'')}</span></div><span class="item-arrow" style="margin-left:auto">›</span></div>`;});html+=`</div>`;}
+  document.getElementById('pp-body').innerHTML=html;
+  document.getElementById('panel-project').classList.add('open');
+}
+function closeProjectPanel(){document.getElementById('panel-project').classList.remove('open');closeDetailPanel();if(panelFadeProjectId){panelFadeProjectId=null;renderChart(document.getElementById('search').value.trim()||undefined);}}
+
+function clearIsolation(){isolation=null;document.getElementById('filter-banner').classList.remove('visible');renderChart();}
+
+function openRelationDetail(nAe,nBe,cA,cB,rE,iE,oE){const nA=decodeURIComponent(nAe),nB=decodeURIComponent(nBe),rel=decodeURIComponent(rE),inp=decodeURIComponent(iE),out=decodeURIComponent(oE);document.getElementById('dd-dot').style.display='block';document.getElementById('dd-dot').style.background=cB;document.getElementById('dd-title').textContent=nB;document.getElementById('dd-subtitle').textContent=`Relationship with ${nA}`;document.getElementById('dd-body').innerHTML=`<div class="p-section"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem"><span class="rel-section-icon" style="background:#eff6ff;color:#1d4ed8">🤝</span><strong style="font-size:.82rem">Relationship</strong></div><div class="detail-body">${escapeHtml(rel)||'No description.'}</div></div><div class="p-section"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem"><span class="rel-section-icon" style="background:#f0fdf4;color:#059669">↓</span><strong style="font-size:.82rem">Input from ${escapeHtml(nB)}</strong></div><div class="detail-body">${escapeHtml(inp)||'No input defined.'}</div></div><div class="p-section"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem"><span class="rel-section-icon" style="background:#fdf4ff;color:#7c3aed">↑</span><strong style="font-size:.82rem">Output to ${escapeHtml(nB)}</strong></div><div class="detail-body">${escapeHtml(out)||'No output defined.'}</div></div>`;document.getElementById('panel-detail').classList.add('open');}
+function closeDetailPanel(){document.getElementById('panel-detail').classList.remove('open');closeDetail2Panel();}
+
+async function openStandardDetail(stdId, scopeOverride, fromDeptId){
+  const s=await fetch(`/api/standards/${stdId}`).then(r=>r.ok?r.json():null).catch(()=>null);
+  if(!s) return;
+  document.getElementById('dd-dot').style.display='block';
+  document.getElementById('dd-dot').style.background='#1d4ed8';
+  document.getElementById('dd-title').textContent=s.code;
+  document.getElementById('dd-subtitle').textContent=s.full_name;
+  let html='';
+  // General description
+  if(s.description){html+=`<div class="p-section"><div class="p-sec-label">Overview</div><p style="font-size:.85rem;color:var(--text);line-height:1.65;white-space:pre-wrap">${escapeHtml(s.description)}</p></div>`;}
+  if(s.url) html+=`<div class="p-section"><div class="p-sec-label">Reference</div><a href="${escapeHtml(s.url)}" target="_blank" style="font-size:.82rem;color:#1d4ed8;word-break:break-all">${escapeHtml(s.url)}</a></div>`;
+  // Scope for this context (passed from the dept/project panel)
+  if(scopeOverride) html+=`<div class="p-section"><div class="p-sec-label">Applicable Scope</div><p style="font-size:.85rem;color:var(--text);line-height:1.65;white-space:pre-wrap">${escapeHtml(scopeOverride)}</p></div>`;
+  // Department-specific clause entries (free-text clause+comment rows)
+  if(fromDeptId){
+    try{
+      const entries=await fetch(`/api/departments/${fromDeptId}/standards/${stdId}/entries`).then(r=>r.json());
+      if(entries&&entries.length){
+        html+=`<div class="p-section"><div class="p-sec-label">Applicable Clauses</div>`;
+        entries.forEach(e=>{
+          html+=`<div class="panel-item" style="flex-direction:column;align-items:flex-start;gap:.1rem">
+            <div style="display:flex;align-items:flex-start;gap:.35rem;width:100%">
+              <span style="font-size:.82rem;font-weight:600;color:#1e40af;flex:1">${escapeHtml(e.clause_text)}</span>
+            </div>
+            ${e.comment?`<div style="font-size:.75rem;color:#475569;margin-left:.1rem;line-height:1.5;margin-top:.15rem">${escapeHtml(e.comment)}</div>`:''}
+          </div>`;
+        });
+        html+=`</div>`;
+      }
+    }catch(err){console.warn('Could not load dept entries',err);}
+  }
+  // Which departments use this standard
+  if(s.departments&&s.departments.length){html+=`<div class="p-section"><div class="p-sec-label">Departments</div>`;s.departments.forEach(d=>{html+=`<div class="panel-item" onclick="openDeptPanelById(${d.id},'${d.color||'#2563eb'}')" style="flex-direction:column;align-items:flex-start;gap:.1rem"><div style="display:flex;align-items:center;gap:.35rem"><span style="width:8px;height:8px;border-radius:50%;background:${d.color||'#2563eb'}"></span><span class="item-label">${escapeHtml(d.name)}</span></div>${d.scope?`<div style="font-size:.73rem;color:var(--muted);line-height:1.35;padding-left:1.2rem">${escapeHtml(d.scope)}</div>`:''}</div>`;});html+=`</div>`;}
+  // Which projects use this standard
+  if(s.projects&&s.projects.length){html+=`<div class="p-section"><div class="p-sec-label">Client Projects</div>`;s.projects.forEach(p=>{html+=`<div class="panel-item" onclick="openProjectPanel(${p.id})" style="flex-direction:column;align-items:flex-start;gap:.1rem"><div style="display:flex;align-items:center;gap:.35rem"><span style="width:8px;height:8px;border-radius:50%;background:${p.color||'#0f766e'}"></span><span class="item-label">${escapeHtml(p.name)}</span></div>${p.scope?`<div style="font-size:.73rem;color:var(--muted);line-height:1.35;padding-left:1.2rem">${escapeHtml(p.scope)}</div>`:''}</div>`;});html+=`</div>`;}
+  document.getElementById('dd-body').innerHTML=html;
+  document.getElementById('panel-detail').classList.add('open');
+}
+
+async function openPositionDetail(posId){
+  const pos=await fetch(`/api/positions/${posId}`).then(r=>r.ok?r.json():null).catch(()=>null);
+  if(!pos){toast('Could not load position.','err');return;}
+  const dept=pos.department_id?allDepts.find(d=>d.id===pos.department_id):null;
+  const color=dept?dept.color:'#2563eb';
+  document.getElementById('dd-dot').style.display='block';
+  document.getElementById('dd-dot').style.background=color;
+  document.getElementById('dd-title').textContent=pos.title;
+  document.getElementById('dd-subtitle').textContent=dept?dept.name:'No department';
+  let html='<div class="p-section">';
+  html+=`<div class="ev-detail-row"><strong>Holders</strong><span>${pos.headcount||0} employee${pos.headcount!==1?'s':''}</span></div>`;
+  if(dept) html+=`<div class="ev-detail-row"><strong>Department</strong><span style="display:flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${escapeHtml(dept.name)}</span></div>`;
+  if(pos.project_id){const proj=allProjects.find(p=>p.id===pos.project_id);if(proj) html+=`<div class="ev-detail-row"><strong>Project</strong><span>◆ ${escapeHtml(proj.name)}</span></div>`;}
+  html+='</div>';
+  // List holders
+  const holders=allNodes.filter(n=>n.position_id===posId);
+  if(holders.length){html+=`<div class="p-section"><div class="p-sec-label">Employees in this role</div>`;holders.forEach(h=>{const c=(h.dept_color||color).replace('#','');const a=`https://ui-avatars.com/api/?name=${encodeURIComponent(h.name)}&background=${c}&color=fff&size=80&bold=true&font-size=0.4`;html+=`<div class="member-row" onclick="openEmployeeDetail(${h.id})" style="cursor:pointer"><img src="${a}"/><div><strong>${escapeHtml(h.name)}</strong><span>${escapeHtml(h.title||'')}</span></div><span class="item-arrow" style="margin-left:auto">›</span></div>`;});html+=`</div>`;}
+  document.getElementById('dd-body').innerHTML=html;
+  document.getElementById('panel-detail').classList.add('open');
+}
+
+async function openEmployeeDetail(empId){
+  const emp=allNodes.find(n=>n.id===empId);
+  if(!emp){toast('Employee not found.','err');return;}
+  closeDetail2Panel();
+  const color=(emp.dept_color||'#2563eb').replace('#','');
+  const a=`https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name)}&background=${color}&color=fff&size=256&bold=true&font-size=0.4`;
+  document.getElementById('dd-dot').style.display='none';
+  document.getElementById('dd-title').textContent=emp.name;
+  document.getElementById('dd-subtitle').textContent=emp.title||'No position';
+  let html=`<div style="text-align:center;margin-bottom:1rem"><img src="${a}" style="width:64px;height:64px;border-radius:14px"/></div>`;
+  html+='<div class="p-section"><div class="p-sec-label">Details</div>';
+  if(emp.title&&emp.position_id) html+=`<div class="panel-item" onclick="openPositionDetail2(${emp.position_id})" style="cursor:pointer"><span class="item-label">${escapeHtml(emp.title)}</span><span class="item-arrow">\u203a</span></div>`;
+  else if(emp.title) html+=`<div class="ev-detail-row"><strong>Position</strong><span>${escapeHtml(emp.title)}</span></div>`;
+  if(emp.dept) html+=`<div class="ev-detail-row"><strong>Department</strong><span style="display:flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:#${color}"></span>${escapeHtml(emp.dept)}</span></div>`;
+  const mgr=emp.pid?allNodes.find(n=>n.id===emp.pid):null;
+  if(mgr) html+=`<div class="ev-detail-row"><strong>Reports to</strong><span>${escapeHtml(mgr.name)}</span></div>`;
+  if(emp.location_name) html+=`<div class="ev-detail-row"><strong>Location</strong><span>${escapeHtml(emp.location_name)}${emp.location_country?', '+escapeHtml(emp.location_country):''}</span></div>`;
+  if(emp.hire_date) html+=`<div class="ev-detail-row"><strong>Hire Date</strong><span>${escapeHtml(emp.hire_date)}</span></div>`;
+  const emails=Array.isArray(emp.emails)?emp.emails:[];
+  emails.forEach(e=>{html+=`<div class="ev-detail-row"><strong>${escapeHtml(e.label||'Email')}${e.is_primary?' \u2605':''}</strong><span>${escapeHtml(e.email)}</span></div>`;});
+  if(emp.phone) html+=`<div class="ev-detail-row"><strong>Phone</strong><span>${escapeHtml(emp.phone)}</span></div>`;
+  html+='</div>';
+  if(emp.projects&&emp.projects.length){html+=`<div class="p-section"><div class="p-sec-label">Project Assignments</div>`;emp.projects.forEach(p=>{const proj=allProjects.find(x=>x.id===p.project_id);html+=`<div class="panel-item" onclick="openProjectPanel(${p.project_id})"><div class="rel-dot" style="background:${proj?proj.color:'#0f766e'}"></div><span class="item-label">\u25c6 ${escapeHtml(proj?proj.name:'Project')}${p.role_on_project?' \u2014 '+escapeHtml(p.role_on_project):''}</span><span class="item-arrow">\u203a</span></div>`;});html+=`</div>`;}
+  if(emp.bio) html+=`<div class="p-section"><div class="p-sec-label">About</div><p style="font-size:.85rem;color:var(--text);line-height:1.65;white-space:pre-wrap">${escapeHtml(emp.bio)}</p></div>`;
+  // Personal background
+  if(emp.education||emp.experience){
+    html+=`<div class="p-section"><div class="p-sec-label">Background</div>`;
+    if(emp.education) html+=`<div style="margin-bottom:.6rem"><strong style="font-size:.78rem;color:#475569;display:block;margin-bottom:.2rem">Education</strong><p style="font-size:.85rem;color:var(--text);line-height:1.65;white-space:pre-wrap;margin:0">${escapeHtml(emp.education)}</p></div>`;
+    if(emp.experience) html+=`<div><strong style="font-size:.78rem;color:#475569;display:block;margin-bottom:.2rem">Past Experience</strong><p style="font-size:.85rem;color:var(--text);line-height:1.65;white-space:pre-wrap;margin:0">${escapeHtml(emp.experience)}</p></div>`;
+    html+=`</div>`;
+  }
+  document.getElementById('dd-body').innerHTML=html;
+  document.getElementById('panel-detail').classList.add('open');
+}
+
+async function openPositionDetail2(posId){
+  const pos=await fetch(`/api/positions/${posId}`).then(r=>r.ok?r.json():null).catch(()=>null);
+  if(!pos) return;
+  const dept=pos.department_id?allDepts.find(d=>d.id===pos.department_id):null;
+  const color=dept?dept.color:'#2563eb';
+  document.getElementById('d2-dot').style.display='block';
+  document.getElementById('d2-dot').style.background=color;
+  document.getElementById('d2-title').textContent=pos.title;
+  document.getElementById('d2-subtitle').textContent=dept?dept.name:'Position details';
+  let html='<div class="p-section">';
+  html+=`<div class="ev-detail-row"><strong>Holders</strong><span>${pos.headcount||0}</span></div>`;
+  if(dept) html+=`<div class="ev-detail-row"><strong>Department</strong><span>${escapeHtml(dept.name)}</span></div>`;
+  if(pos.project_id){const proj=allProjects.find(p=>p.id===pos.project_id);if(proj) html+=`<div class="ev-detail-row"><strong>Project</strong><span>\u25c6 ${escapeHtml(proj.name)}</span></div>`;}
+  if(pos.description) html+=`<div class="p-sec-label" style="margin-top:.7rem">Job Description</div><p style="font-size:.85rem;color:var(--text);line-height:1.65;white-space:pre-wrap">${escapeHtml(pos.description)}</p>`;
+  html+='</div>';
+  const holders=allNodes.filter(n=>n.position_id===posId);
+  if(holders.length){html+=`<div class="p-section"><div class="p-sec-label">Employees</div>`;holders.forEach(h=>{const c=(h.dept_color||color).replace('#','');const a=`https://ui-avatars.com/api/?name=${encodeURIComponent(h.name)}&background=${c}&color=fff&size=80&bold=true&font-size=0.4`;html+=`<div class="member-row"><img src="${a}"/><div><strong>${escapeHtml(h.name)}</strong><span>${escapeHtml(h.title||'')}</span></div></div>`;});html+=`</div>`;}
+  document.getElementById('d2-body').innerHTML=html;
+  document.getElementById('panel-detail-2').classList.add('open');
+}
+function closeDetail2Panel(){document.getElementById('panel-detail-2').classList.remove('open');}
+
+// Single Collapse/Expand toggle
+let treeCollapsed=false;
+function toggleTreeCollapsed(){
+  treeCollapsed=!treeCollapsed;
+  document.getElementById('btn-tree-toggle').textContent=treeCollapsed?'Expand all':'Collapse all';
+  renderChart(document.getElementById('search').value.trim()||undefined);
+}
+document.getElementById('search').addEventListener('input',function(){if(this.value.trim()){isolation=null;document.getElementById('filter-banner').classList.remove('visible');}renderChart(this.value.trim()||undefined);});
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KiKxxl-evroTarget — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:linear-gradient(135deg,#eff6ff 0%,#f0f4ff 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.card{background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(29,78,216,.12);padding:2.5rem 2rem;width:100%;max-width:400px;}
+.logo{display:flex;align-items:center;gap:.65rem;margin-bottom:2rem;}
+.badge{background:#1d4ed8;color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.07em;padding:.28rem .6rem;border-radius:6px;text-transform:uppercase;white-space:nowrap;}
+.logo-name{font-size:1.05rem;font-weight:700;color:#111827;}
+h1{font-size:1.35rem;font-weight:700;color:#111827;margin-bottom:.4rem;}
+.sub{font-size:.85rem;color:#6b7280;margin-bottom:1.75rem;}
+.field{margin-bottom:1rem;}
+label{display:block;font-size:.78rem;font-weight:600;color:#374151;margin-bottom:.3rem;}
+input{width:100%;padding:.55rem .75rem;border:1.5px solid #dde3f0;border-radius:9px;font-family:'Outfit',sans-serif;font-size:.92rem;color:#111827;outline:none;transition:border .15s,box-shadow .15s;}
+input:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px #dbeafe;}
+.btn{width:100%;padding:.65rem;border:none;border-radius:9px;background:#1d4ed8;color:#fff;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .15s;margin-top:.5rem;}
+.btn:hover{background:#1e40af;}
+.btn:disabled{background:#93c5fd;cursor:not-allowed;}
+.btn-link{background:none;border:none;color:#1d4ed8;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;padding:0;margin-top:.5rem;display:block;width:100%;text-align:center;}
+.btn-link:hover{text-decoration:underline;}
+.error{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;padding:.6rem .85rem;font-size:.82rem;margin-top:.85rem;display:none;}
+.error.visible{display:block;}
+.success{background:#f0fdf4;border:1px solid #86efac;color:#166534;border-radius:8px;padding:.6rem .85rem;font-size:.82rem;margin-top:.85rem;display:none;line-height:1.55;}
+.success.visible{display:block;}
+.footer{text-align:center;margin-top:1.5rem;font-size:.78rem;color:#9ca3af;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><span class="badge">KiKxxl-evroTarget</span><span class="logo-name">Organization Chart</span></div>
+
+  <div id="signin-block">
+    <h1>Sign in</h1>
+    <p class="sub">Enter your credentials to access the org chart.</p>
+    <form id="form" onsubmit="login(event)" autocomplete="off">
+      <div class="field"><label for="username">Username</label><input id="username" type="text" autocomplete="off" placeholder="your.username" required/></div>
+      <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="off" placeholder="••••••••" required/></div>
+      <button class="btn" id="btn" type="submit">Sign in</button>
+      <button class="btn-link" type="button" onclick="showForgot()">Forgot password?</button>
+      <div class="error" id="error"></div>
+    </form>
+  </div>
+
+  <div id="forgot-block" style="display:none">
+    <h1>Forgot password</h1>
+    <p class="sub">Enter the email address associated with your account. We'll send you a reset link if it exists.</p>
+    <form id="forgot-form" onsubmit="forgot(event)">
+      <div class="field"><label for="forgot-email">Email</label><input id="forgot-email" type="email" placeholder="you@example.com" required/></div>
+      <button class="btn" id="forgot-btn" type="submit">Send reset link</button>
+      <button class="btn-link" type="button" onclick="showSignin()">← Back to sign in</button>
+      <div class="error" id="forgot-error"></div>
+      <div class="success" id="forgot-success">If an account exists for that email, a reset link is on its way. Check your inbox in the next few minutes.</div>
+    </form>
+  </div>
+
+  <p class="footer">Contact your administrator if you need access.</p>
+</div>
+
+<script>
+function showForgot(){document.getElementById('signin-block').style.display='none';document.getElementById('forgot-block').style.display='block';document.getElementById('forgot-email').focus();}
+function showSignin(){document.getElementById('forgot-block').style.display='none';document.getElementById('signin-block').style.display='block';document.getElementById('forgot-success').classList.remove('visible');document.getElementById('forgot-error').classList.remove('visible');}
+
+async function login(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn');
+  const err = document.getElementById('error');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  err.classList.remove('visible');
+  try {
+    const res = await fetch('/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      err.textContent = data.error || 'Login failed.';
+      err.classList.add('visible');
+      btn.disabled = false; btn.textContent = 'Sign in';
+      return;
+    }
+    window.location.href = '/';
+  } catch {
+    err.textContent = 'Connection error. Please try again.';
+    err.classList.add('visible');
+    btn.disabled = false; btn.textContent = 'Sign in';
+  }
+}
+
+async function forgot(e) {
+  e.preventDefault();
+  const btn = document.getElementById('forgot-btn');
+  const err = document.getElementById('forgot-error');
+  const ok  = document.getElementById('forgot-success');
+  err.classList.remove('visible'); ok.classList.remove('visible');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const res = await fetch('/auth/forgot-password', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: document.getElementById('forgot-email').value.trim() })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      err.textContent = data.error || 'Could not process request.';
+      err.classList.add('visible');
+      btn.disabled = false; btn.textContent = 'Send reset link';
+      return;
+    }
+    ok.classList.add('visible');
+    btn.disabled = false; btn.textContent = 'Send reset link';
+  } catch {
+    err.textContent = 'Connection error. Please try again.';
+    err.classList.add('visible');
+    btn.disabled = false; btn.textContent = 'Send reset link';
+  }
+}
+</script>
+</body>
+</html>

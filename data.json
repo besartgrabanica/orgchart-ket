@@ -1,0 +1,594 @@
+{
+  "locations": [
+    {
+      "name": "Pristina",
+      "country": "Kosovo"
+    },
+    {
+      "name": "Gjilan",
+      "country": "Kosovo"
+    },
+    {
+      "name": "Peja",
+      "country": "Kosovo"
+    }
+  ],
+  "departments": [
+    {
+      "name": "Human Resources",
+      "color": "#ec4899",
+      "description": "HR management, recruitment and employee relations.",
+      "head": "Adeline Zeka"
+    },
+    {
+      "name": "Learning & Development",
+      "color": "#f59e0b",
+      "description": "Training, onboarding and professional development.",
+      "head": "Lavdim Imeri"
+    },
+    {
+      "name": "Operations",
+      "color": "#0f766e",
+      "description": "Structural department that client projects branch off.",
+      "sort_order": 999
+    }
+  ],
+  "positions": [
+    {
+      "title": "CEO",
+      "description": "Sets the strategic direction, oversees all operations and departments, manages stakeholder relationships, and drives business growth. Accountable for overall company performance and culture."
+    },
+    {
+      "title": "HR Manager",
+      "department": "Human Resources",
+      "description": "Leads the HR department, designs and implements HR policies, oversees recruitment, employee relations, compensation and benefits. Ensures legal compliance and fosters a positive workplace culture."
+    },
+    {
+      "title": "HR Officer",
+      "department": "Human Resources",
+      "description": "Handles day-to-day HR operations including recruitment, onboarding, employee records management, leave administration, and employee inquiries. Supports the HR Manager in policy implementation."
+    },
+    {
+      "title": "Head of Learning & Development",
+      "department": "Learning & Development",
+      "description": "Designs and manages the company's training strategy, identifies skill gaps, develops learning programs, coordinates with project teams on onboarding needs, and measures training effectiveness."
+    },
+    {
+      "title": "L&D Officer",
+      "department": "Learning & Development",
+      "description": "Delivers training sessions, creates learning materials, manages the LMS platform, tracks employee progress and certifications, and supports onboarding for new hires."
+    },
+    {
+      "title": "Project Leader (E.ON)",
+      "project": "E.ON",
+      "description": "Manages daily operations of the E.ON energy client project, supervises team performance, ensures SLA compliance, handles escalations, and reports to senior leadership on KPIs."
+    },
+    {
+      "title": "Senior Project Leader (E.ON)",
+      "project": "E.ON",
+      "description": "Oversees the E.ON project at a strategic level, manages client relationships, coordinates with multiple team leaders, drives process improvements, and ensures quality standards are met."
+    },
+    {
+      "title": "Training & Quality Coordinator (E.ON)",
+      "project": "E.ON",
+      "description": "Develops training materials specific to E.ON processes, conducts quality audits, monitors call quality, provides coaching and feedback, and ensures compliance with client requirements."
+    },
+    {
+      "title": "Project Leader (Freenet)",
+      "project": "Freenet",
+      "description": "Manages daily operations of the Freenet telecommunications client project, supervises agents, monitors performance metrics, and handles client reporting."
+    },
+    {
+      "title": "Senior Project Leader (Freenet)",
+      "project": "Freenet",
+      "description": "Strategic oversight of the Freenet project, manages client expectations, coordinates team scheduling, drives efficiency improvements, and handles complex escalations."
+    },
+    {
+      "title": "Team Leader (Freenet)",
+      "project": "Freenet",
+      "description": "Directly supervises a team of agents on the Freenet project, handles real-time queue management, provides coaching, and ensures daily targets are met."
+    },
+    {
+      "title": "Emergency Team Lead (Flixbus)",
+      "project": "Flixbus",
+      "description": "Handles urgent and emergency situations for the Flixbus mobility project, coordinates rapid response, manages crisis communication, and ensures passenger safety protocols are followed."
+    },
+    {
+      "title": "Project Leader (Flixbus)",
+      "project": "Flixbus",
+      "description": "Manages daily operations of the Flixbus mobility client project, oversees team performance, ensures service quality, and coordinates with client contacts."
+    },
+    {
+      "title": "Senior Team Leader (Flixbus)",
+      "project": "Flixbus",
+      "description": "Oversees multiple teams on the Flixbus project, manages scheduling and workforce planning, drives performance improvements, and serves as the primary operational contact."
+    },
+    {
+      "title": "Team Leader (Flixbus)",
+      "project": "Flixbus",
+      "description": "Supervises a team of agents handling Flixbus customer inquiries, manages shift operations, provides real-time support, and conducts performance reviews."
+    }
+  ],
+  "client_projects": [
+    {
+      "name": "E.ON",
+      "client_company": "E.ON",
+      "status": "active",
+      "color": "#1d4ed8",
+      "languages": "DE",
+      "head": "Qendrim Bruqi"
+    },
+    {
+      "name": "Freenet",
+      "client_company": "Freenet GmbH",
+      "status": "active",
+      "color": "#7c3aed",
+      "languages": "DE",
+      "head": "Arbenor Salihu"
+    },
+    {
+      "name": "Flixbus",
+      "client_company": "Flixbus",
+      "status": "active",
+      "color": "#16a34a",
+      "languages": "EN, DA, IT, SV, FR, DE",
+      "head": "Visar Bytyqi"
+    }
+  ],
+  "employees": [
+    {
+      "first_name": "Artan",
+      "last_name": "Bajrami",
+      "position": "CEO",
+      "location": "Pristina",
+      "education": "MBA, International Business \u2014 University of Ljubljana, 2012\nBSc Economics \u2014 University of Pristina, 2008",
+      "experience": "2015\u20132020: Operations Director, Telecom Solutions GmbH, Berlin\n2012\u20132015: Business Development Manager, KiKxxl GmbH, Osnabr\u00fcck\n2008\u20132012: Project Coordinator, ProCall Services, Pristina"
+    },
+    {
+      "first_name": "Adeline",
+      "last_name": "Zeka",
+      "position": "HR Manager",
+      "manager": "Artan Bajrami",
+      "location": "Pristina",
+      "education": "MSc Human Resource Management \u2014 South East European University, 2017\nBSc Psychology \u2014 University of Pristina, 2014",
+      "experience": "2019\u20132022: HR Specialist, IPKO Telecommunications, Pristina\n2017\u20132019: Recruitment Coordinator, Raiffeisen Bank Kosovo\n2014\u20132017: HR Assistant, Meridian Corporation, Pristina"
+    },
+    {
+      "first_name": "Leandra",
+      "last_name": "Prekazi",
+      "position": "HR Officer",
+      "manager": "Adeline Zeka",
+      "location": "Pristina",
+      "education": "BSc Business Administration \u2014 University of Pristina, 2020",
+      "experience": "2021\u20132023: HR Assistant, Bechtel Enka, Pristina\n2020\u20132021: Administrative Coordinator, ProCredit Bank Kosovo"
+    },
+    {
+      "first_name": "Nita",
+      "last_name": "Azemi",
+      "position": "HR Officer",
+      "manager": "Adeline Zeka",
+      "location": "Gjilan",
+      "education": "BSc Sociology \u2014 University of Pristina, 2019",
+      "experience": "2020\u20132022: People Operations Associate, Gjirafa Inc., Pristina\n2019\u20132020: Office Administrator, Cacttus Education, Pristina"
+    },
+    {
+      "first_name": "Kaltrina",
+      "last_name": "Krasniqi",
+      "position": "HR Officer",
+      "manager": "Adeline Zeka",
+      "location": "Pristina",
+      "education": "BSc Management \u2014 AAB College, Pristina, 2021",
+      "experience": "2022\u20132023: Junior HR Coordinator, Z Mobile, Pristina"
+    },
+    {
+      "first_name": "Lavdim",
+      "last_name": "Imeri",
+      "position": "Head of Learning & Development",
+      "manager": "Artan Bajrami",
+      "location": "Pristina",
+      "education": "MSc Education & Training \u2014 University of Primorska, 2016\nBSc Pedagogy \u2014 University of Pristina, 2013",
+      "experience": "2018\u20132022: Learning & Development Manager, Raiffeisen Bank Kosovo\n2016\u20132018: Training Coordinator, IPKO Telecommunications\n2013\u20132016: Education Specialist, Kosovo Education Center"
+    },
+    {
+      "first_name": "Drita",
+      "last_name": "Prenaj",
+      "position": "L&D Officer",
+      "manager": "Lavdim Imeri",
+      "location": "Pristina",
+      "education": "BSc Communication \u2014 University of Pristina, 2020",
+      "experience": "2021\u20132023: Training Facilitator, Digital School Kosovo\n2020\u20132021: Teaching Assistant, Universum College, Pristina"
+    },
+    {
+      "first_name": "Fatbardh",
+      "last_name": "Kabashi",
+      "position": "L&D Officer",
+      "manager": "Lavdim Imeri",
+      "location": "Peja",
+      "education": "BSc Information Technology \u2014 University of Pristina, 2019",
+      "experience": "2020\u20132023: E-Learning Developer, Kosovo Digital Academy\n2019\u20132020: IT Support, Frakton Development, Pristina"
+    },
+    {
+      "first_name": "Qendrim",
+      "last_name": "Bruqi",
+      "position": "Senior Project Leader (E.ON)",
+      "manager": "Artan Bajrami",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "E.ON",
+          "role_on_project": "Senior Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Business Informatics \u2014 University of Pristina, 2015",
+      "experience": "2018\u20132022: Senior Project Manager, KiKxxl GmbH, Osnabr\u00fcck\n2015\u20132018: Operations Supervisor, Teleperformance, Pristina"
+    },
+    {
+      "first_name": "Agon",
+      "last_name": "Kosumi",
+      "position": "Project Leader (E.ON)",
+      "manager": "Qendrim Bruqi",
+      "location": "Gjilan",
+      "projects": [
+        {
+          "project": "E.ON",
+          "role_on_project": "Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Electrical Engineering \u2014 University of Pristina, 2018",
+      "experience": "2020\u20132023: Operations Lead, KEDS Energy Distribution, Pristina\n2018\u20132020: Technical Support Lead, Vodafone Albania"
+    },
+    {
+      "first_name": "Bujar",
+      "last_name": "Surdulli",
+      "position": "Project Leader (E.ON)",
+      "manager": "Qendrim Bruqi",
+      "location": "Gjilan",
+      "projects": [
+        {
+          "project": "E.ON",
+          "role_on_project": "Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Economics \u2014 AAB College, 2017",
+      "experience": "2019\u20132023: Team Coordinator, Concentrix, Pristina\n2017\u20132019: Customer Service Supervisor, Meridian Corporation"
+    },
+    {
+      "first_name": "Denis",
+      "last_name": "Panxhaj",
+      "position": "Project Leader (E.ON)",
+      "manager": "Qendrim Bruqi",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "E.ON",
+          "role_on_project": "Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Management \u2014 University of Pristina, 2019",
+      "experience": "2020\u20132023: Shift Manager, Sitel Group, Pristina\n2019\u20132020: Quality Analyst, KOSTT, Pristina"
+    },
+    {
+      "first_name": "Saranda",
+      "last_name": "Hyseni",
+      "position": "Training & Quality Coordinator (E.ON)",
+      "manager": "Qendrim Bruqi",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "E.ON",
+          "role_on_project": "Training & Quality Coordinator",
+          "is_primary": true
+        }
+      ],
+      "education": "MSc Quality Management \u2014 University of Pristina, 2020\nBSc Industrial Engineering \u2014 University of Pristina, 2017",
+      "experience": "2020\u20132023: Quality Assurance Lead, Telekom Kosovo\n2017\u20132020: Process Analyst, Meridian Corporation, Pristina"
+    },
+    {
+      "first_name": "Arbenor",
+      "last_name": "Salihu",
+      "position": "Senior Project Leader (Freenet)",
+      "manager": "Artan Bajrami",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Freenet",
+          "role_on_project": "Senior Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Computer Science \u2014 University of Pristina, 2016",
+      "experience": "2019\u20132023: Senior Operations Manager, Atos, Pristina\n2016\u20132019: Project Coordinator, Asseco SEE, Pristina"
+    },
+    {
+      "first_name": "Vitar",
+      "last_name": "Hasani",
+      "position": "Project Leader (Freenet)",
+      "manager": "Arbenor Salihu",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Freenet",
+          "role_on_project": "Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Business Administration \u2014 RIT Kosovo, 2019",
+      "experience": "2020\u20132023: Operations Analyst, BIRN Kosovo\n2019\u20132020: Business Analyst Intern, Deloitte Kosovo"
+    },
+    {
+      "first_name": "Dibran",
+      "last_name": "Kalanderi",
+      "position": "Team Leader (Freenet)",
+      "manager": "Vitar Hasani",
+      "location": "Peja",
+      "projects": [
+        {
+          "project": "Freenet",
+          "role_on_project": "Team Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Management \u2014 University of Pristina, 2020",
+      "experience": "2021\u20132023: Shift Supervisor, Sitel Group, Pristina"
+    },
+    {
+      "first_name": "Gentrit",
+      "last_name": "Aruci",
+      "position": "Team Leader (Freenet)",
+      "manager": "Vitar Hasani",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Freenet",
+          "role_on_project": "Team Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Information Systems \u2014 UBT, Pristina, 2019",
+      "experience": "2020\u20132023: Team Lead, AppBites, Pristina\n2019\u20132020: Junior Developer, Frakton Development"
+    },
+    {
+      "first_name": "Petrit",
+      "last_name": "Haliti",
+      "position": "Team Leader (Freenet)",
+      "manager": "Vitar Hasani",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Freenet",
+          "role_on_project": "Team Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Economics \u2014 University of Pristina, 2018",
+      "experience": "2019\u20132023: Operations Coordinator, ProCredit Bank Kosovo\n2018\u20132019: Administrative Officer, MFK, Pristina"
+    },
+    {
+      "first_name": "Visar",
+      "last_name": "Bytyqi",
+      "position": "Project Leader (Flixbus)",
+      "manager": "Artan Bajrami",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Flixbus",
+          "role_on_project": "Project Leader",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Transport & Logistics \u2014 University of Pristina, 2017",
+      "experience": "2019\u20132023: Operations Manager, DHL Express Kosovo\n2017\u20132019: Logistics Coordinator, Elkos Group, Pristina"
+    },
+    {
+      "first_name": "Gazmend",
+      "last_name": "Isufi",
+      "position": "Senior Team Leader (Flixbus)",
+      "manager": "Visar Bytyqi",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Flixbus",
+          "role_on_project": "Senior Team Leader",
+          "is_primary": true
+        }
+      ],
+      "divisions": [
+        "German Team"
+      ],
+      "education": "BSc Business Management \u2014 AAB College, 2016",
+      "experience": "2019\u20132023: Senior Team Lead, Concentrix, Pristina\n2016\u20132019: Operations Supervisor, Teleperformance, Pristina"
+    },
+    {
+      "first_name": "Arbnor",
+      "last_name": "Miftari",
+      "position": "Emergency Team Lead (Flixbus)",
+      "manager": "Visar Bytyqi",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Flixbus",
+          "role_on_project": "Emergency Team Lead",
+          "is_primary": true
+        }
+      ],
+      "education": "BSc Crisis Management \u2014 Kosovo Academy for Public Safety, 2018",
+      "experience": "2020\u20132023: Emergency Response Coordinator, KEK Energy, Pristina\n2018\u20132020: Security Operations Lead, G4S Kosovo"
+    },
+    {
+      "first_name": "Ilirida",
+      "last_name": "Podrimaj",
+      "position": "Team Leader (Flixbus)",
+      "manager": "Visar Bytyqi",
+      "location": "Peja",
+      "projects": [
+        {
+          "project": "Flixbus",
+          "role_on_project": "Team Leader",
+          "is_primary": true
+        }
+      ],
+      "divisions": [
+        "French Team"
+      ],
+      "education": "BSc Communication \u2014 University of Pristina, 2020",
+      "experience": "2021\u20132023: Customer Success Associate, Gjirafa Inc., Pristina"
+    },
+    {
+      "first_name": "Fatlum",
+      "last_name": "Avdiu",
+      "position": "Team Leader (Flixbus)",
+      "manager": "Visar Bytyqi",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Flixbus",
+          "role_on_project": "Team Leader",
+          "is_primary": true
+        }
+      ],
+      "divisions": [
+        "German Team"
+      ],
+      "education": "BSc Information Technology \u2014 Universum College, 2019",
+      "experience": "2020\u20132023: Technical Team Lead, KOSTT, Pristina\n2019\u20132020: IT Support Specialist, NLB Bank Kosovo"
+    },
+    {
+      "first_name": "Ardi",
+      "last_name": "Grantolli",
+      "position": "Team Leader (Flixbus)",
+      "manager": "Visar Bytyqi",
+      "location": "Pristina",
+      "projects": [
+        {
+          "project": "Flixbus",
+          "role_on_project": "Team Leader",
+          "is_primary": true
+        }
+      ],
+      "divisions": [
+        "French Team"
+      ],
+      "education": "BSc Business Informatics \u2014 UBT, Pristina, 2021",
+      "experience": "2022\u20132023: Junior Project Coordinator, Cacttus Education, Pristina"
+    }
+  ],
+  "divisions": [
+    {
+      "name": "German Team",
+      "project": "Flixbus",
+      "color": "#facc15"
+    },
+    {
+      "name": "French Team",
+      "project": "Flixbus",
+      "color": "#fb7185"
+    }
+  ],
+  "standards": [
+    {
+      "code": "ISO 9001",
+      "full_name": "Quality Management Systems",
+      "url": "https://www.iso.org/standard/62085.html",
+      "description": "International standard for quality management systems (QMS). It provides a framework for organizations to ensure consistent quality in their products and services, meet customer and regulatory requirements, and continuously improve processes. Applicable to any organization regardless of size or industry."
+    },
+    {
+      "code": "ISO 27001",
+      "full_name": "Information Security Management",
+      "url": "https://www.iso.org/standard/27001",
+      "description": "International standard for information security management systems (ISMS). It specifies requirements for establishing, implementing, maintaining, and continually improving information security. Covers risk assessment, security controls, access management, incident response, and business continuity planning."
+    },
+    {
+      "code": "ISO 45001",
+      "full_name": "Occupational Health and Safety",
+      "url": "https://www.iso.org/standard/63787.html",
+      "description": "International standard for occupational health and safety management systems. It provides a framework to prevent work-related injuries and illness, improve workplace safety, and reduce risks. Covers hazard identification, worker participation, emergency preparedness, and health monitoring."
+    },
+    {
+      "code": "ISO 14001",
+      "full_name": "Environmental Management Systems",
+      "url": "https://www.iso.org/standard/60857.html",
+      "description": "International standard for environmental management systems (EMS). It helps organizations minimize their environmental impact, comply with applicable laws and regulations, and continually improve environmental performance. Covers waste management, emissions, resource efficiency, and environmental risk assessment."
+    },
+    {
+      "code": "GDPR",
+      "full_name": "General Data Protection Regulation",
+      "url": "https://gdpr.eu",
+      "description": "The General Data Protection Regulation is a European Union regulation on data protection and privacy. It governs how personal data is collected, processed, stored, and shared. Key principles include lawfulness, purpose limitation, data minimization, accuracy, storage limitation, integrity, and accountability. Applies to any organization processing EU residents' data."
+    },
+    {
+      "code": "PCI DSS",
+      "full_name": "Payment Card Industry Data Security Standard",
+      "url": "https://www.pcisecuritystandards.org",
+      "description": "The Payment Card Industry Data Security Standard is an information security standard for organizations handling branded credit cards. It sets requirements for secure networks, cardholder data protection, vulnerability management, access control, monitoring, and security policy. Compliance is mandatory for all entities that store, process, or transmit cardholder data."
+    }
+  ],
+  "department_standards": [
+    {
+      "department": "Human Resources",
+      "standard": "ISO 9001",
+      "scope": "Clauses 7.1.2 (People), 7.2 (Competence), 7.3 (Awareness)"
+    },
+    {
+      "department": "Human Resources",
+      "standard": "GDPR",
+      "scope": "Articles 6, 9, 13\u201314 (lawful basis, special categories, employee data privacy notices)"
+    },
+    {
+      "department": "Human Resources",
+      "standard": "ISO 45001",
+      "scope": "Clauses 5.4 (Worker participation), 6.1.2 (Hazard identification), 7.2 (Competence)"
+    },
+    {
+      "department": "Learning & Development",
+      "standard": "ISO 9001",
+      "scope": "Clauses 7.2 (Competence), 7.3 (Awareness), 10.3 (Continual improvement)"
+    },
+    {
+      "department": "Operations",
+      "standard": "ISO 9001",
+      "scope": "Clauses 8.1 (Operational planning), 8.5.1 (Production/service provision), 9.1 (Monitoring & measurement)"
+    },
+    {
+      "department": "Operations",
+      "standard": "ISO 27001",
+      "scope": "Annex A.6 (Organization of information security), A.7 (HR security), A.9 (Access control), A.12 (Operations security)"
+    },
+    {
+      "department": "Operations",
+      "standard": "ISO 14001",
+      "scope": "Clauses 6.1.2 (Environmental aspects), 8.1 (Operational planning), 9.1 (Monitoring)"
+    },
+    {
+      "department": "Operations",
+      "standard": "PCI DSS",
+      "scope": "Requirements 3 (Stored data), 7 (Access restriction), 8 (Authentication), 10 (Logging & monitoring)"
+    }
+  ],
+  "department_relations": [
+    {
+      "dept_a": "Human Resources",
+      "dept_b": "Learning & Development",
+      "relation": "HR provides employee data and training needs assessments",
+      "input_from_b": "Training completion reports, skill gap analysis",
+      "output_to_b": "New hire onboarding plans, performance review data"
+    },
+    {
+      "dept_a": "Human Resources",
+      "dept_b": "Operations",
+      "relation": "HR supplies staffing and compliance support to Operations",
+      "input_from_b": "Resource requests, project staffing needs",
+      "output_to_b": "Recruitment, contract management, compliance oversight"
+    },
+    {
+      "dept_a": "Learning & Development",
+      "dept_b": "Operations",
+      "relation": "L&D provides training programs for project teams",
+      "input_from_b": "Training requirements per project, language needs",
+      "output_to_b": "Certified training programs, language courses, onboarding"
+    }
+  ]
+}
